@@ -11,7 +11,6 @@ use directories::ProjectDirs;
 use log::{trace, Level};
 use serde::{Deserialize, Serialize};
 use std::{
-    env,
     fs::{self, File},
     io::{self, BufReader},
     net::{IpAddr, Ipv4Addr},
@@ -25,7 +24,7 @@ const CONFIG_DIR_ORGANISATION: &str = "MaidSafe";
 const CONFIG_DIR_APPLICATION: &str = "safe_vault";
 const CONFIG_FILE: &str = "vault.config";
 const CONNECTION_INFO_FILE: &str = "vault_connection_info.config";
-const DEFAULT_ROOT_DIR_NAME: &str = "safe_vault";
+//const DEFAULT_ROOT_DIR_NAME: &str = "safe_vault";
 const DEFAULT_MAX_CAPACITY: u64 = 2 * 1024 * 1024 * 1024;
 const ARGS: [&str; 12] = [
     "wallet-address",
@@ -109,7 +108,7 @@ impl Config {
     pub fn root_dir(&self) -> PathBuf {
         self.root_dir
             .clone()
-            .unwrap_or_else(|| env::temp_dir().join(DEFAULT_ROOT_DIR_NAME))
+            .unwrap_or_else(|| PathBuf::from(unwrap!(dirs()).data_dir()))
     }
 
     /// Set the root directory for `ChunkStore`s and cached state.

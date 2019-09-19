@@ -75,7 +75,8 @@ impl IDataHandler {
             })
         };
 
-        if self.metadata.exists(&(*kind.address()).to_db_key()) {
+        if self.metadata.exists(&(*kind.address()).to_db_key())
+        {
             if kind.is_pub() {
                 trace!(
                     "{}: Replying success for Put {:?}, it already exists.",

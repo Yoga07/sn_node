@@ -155,7 +155,7 @@ impl<T: Chunk> ChunkStore<T> {
             fs::metadata(path)
                 .as_ref()
                 .map(Metadata::is_file)
-                .unwrap_or(false)
+                .unwrap_or(false) && self.get(id).is_ok()
         } else {
             false
         }

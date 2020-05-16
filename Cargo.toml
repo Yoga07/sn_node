@@ -46,6 +46,7 @@ crdts = { git = "https://github.com/rust-crdt/rust-crdt", branch = "useability-i
 ed25519-dalek = { version = "0.9.1", features = ["serde"] }
 sha2 = "0.8.1"
 threshold_crypto = "~0.3.2"
+safe-transfers = { git = "https://github.com/oetyng/safe-transfers.git", rev="fb39ece" }
 
 [dev_dependencies]
 maplit = "~1.0.1"

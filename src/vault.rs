@@ -29,6 +29,9 @@ use std::{
     rc::Rc,
 };
 
+#[cfg(not(feature = "mock"))]
+use routing::Node;
+
 const STATE_FILENAME: &str = "state";
 
 #[allow(clippy::large_enum_variant)]

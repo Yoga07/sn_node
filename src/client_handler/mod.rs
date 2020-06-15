@@ -33,6 +33,7 @@ use crate::{
 use bytes::Bytes;
 use log::{error, trace};
 use rand::{CryptoRng, Rng};
+use routing::Node;
 use safe_nd::{MessageId, Money, NodePublicId, PublicId, Request, Response, Signature, XorName};
 use std::{
     cell::{Cell, RefCell},
@@ -141,9 +142,13 @@ impl ClientHandler {
                 response,
                 requester,
                 message_id,
-            } => self
-                .messaging
-                .relay_reponse_to_client(src, &requester, response, message_id),
+                refund: _,
+            } =>
+            // TODO: FIX refunding here
+            {
+                self.messaging
+                    .relay_reponse_to_client(src, &requester, response, message_id)
+            }
         }
     }
 

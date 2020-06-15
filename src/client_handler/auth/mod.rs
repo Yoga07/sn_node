@@ -186,6 +186,7 @@ impl Auth {
                 response: Response::Mutation(result),
                 requester: client,
                 message_id,
+                refund: None,
             },
         })
     }
@@ -225,6 +226,7 @@ impl Auth {
                 response: Response::Mutation(result),
                 requester: client,
                 message_id,
+                refund: None,
             },
         })
     }

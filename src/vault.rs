@@ -18,7 +18,12 @@ use hex_fmt::HexFmt;
 use log::{debug, error, info, trace, warn};
 use rand::{CryptoRng, Rng, SeedableRng};
 use rand_chacha::ChaChaRng;
-use safe_nd::{ClientRequest, LoginPacketRequest, MoneyRequest, NodeFullId, Request, XorName};
+use routing::{
+    event::Event as RoutingEvent, DstLocation, Node, SrcLocation, TransportEvent as ClientEvent,
+};
+use safe_nd::{
+    ClientRequest, LoginPacketRequest, MoneyRequest, NodeFullId, Request, Response, XorName,
+};
 use std::borrow::Cow;
 use std::{
     cell::{Cell, RefCell},
@@ -340,15 +345,6 @@ impl<R: CryptoRng + Rng> Vault<R> {
                     None
                 },
             ),
-            RoutingEvent::MessageReceived { content, src, dst } => {
-                info!(
-                    "Received message: {:8?}\n Sent from {:?} to {:?}",
-                    HexFmt(&content),
-                    src,
-                    dst
-                );
-                self.handle_routing_message(src, content)
-            }
             RoutingEvent::MemberLeft { name, age: _u8 } => {
                 trace!("A node has left the section. Node: {:?}", name);
                 let get_copy_actions = self
@@ -369,29 +365,17 @@ impl<R: CryptoRng + Rng> Vault<R> {
                 info!("No. of Adults: {}", adult_count);
                 None
             }
+            RoutingEvent::MessageReceived { content, src, dst } => {
+                info!(
+                    "Received message: {:8?}\n Sent from {:?} to {:?}",
+                    HexFmt(&content),
+                    src,
+                    dst
+                );
+                self.handle_routing_message(src, content)
+            }
             // Ignore all other events
             _ => None,
-        }
-    }
-
-    fn handle_routing_message(&mut self, src: SrcLocation, message: Vec<u8>) -> Option<Action> {
-        match bincode::deserialize::<Rpc>(&message) {
-            Ok(rpc) => match &rpc {
-                Rpc::Request { request, .. } => match request {
-                    Request::IData(_) => self.data_handler_mut()?.handle_vault_rpc(src, rpc),
-                    other => unimplemented!("Should not receive: {:?}", other),
-                },
-                Rpc::Response { response, .. } => match response {
-                    Response::Mutation(_) | Response::GetIData(_) => {
-                        self.data_handler_mut()?.handle_vault_rpc(src, rpc)
-                    }
-                    _ => unimplemented!("Should not receive: {:?}", response),
-                },
-            },
-            Err(e) => {
-                error!("Error deserializing routing message into Rpc type: {:?}", e);
-                None
-            }
         }
     }
 
@@ -427,6 +411,27 @@ impl<R: CryptoRng + Rng> Vault<R> {
             }
         }
         None
+    }
+
+    fn handle_routing_message(&mut self, src: SrcLocation, message: Vec<u8>) -> Option<Action> {
+        match bincode::deserialize::<Rpc>(&message) {
+            Ok(rpc) => match &rpc {
+                Rpc::Request { request, .. } => match request {
+                    Request::IData(_) => self.data_handler_mut()?.handle_vault_rpc(src, rpc),
+                    other => unimplemented!("Should not receive: {:?}", other),
+                },
+                Rpc::Response { response, .. } => match response {
+                    Response::Mutation(_) | Response::GetIData(_) => {
+                        self.data_handler_mut()?.handle_vault_rpc(src, rpc)
+                    }
+                    _ => unimplemented!("Should not receive: {:?}", response),
+                },
+            },
+            Err(e) => {
+                error!("Error deserializing routing message into Rpc type: {:?}", e);
+                None
+            }
+        }
     }
 
     #[allow(dead_code)]
@@ -578,7 +583,7 @@ impl<R: CryptoRng + Rng> Vault<R> {
         if self.self_is_handler_for(&dst_address) {
             // TODO - We need a better way for determining which handler should be given the
             //        message.
-            return match rpc {
+            return match rpc.clone() {
                 Rpc::Request {
                     request: Request::LoginPacket(LoginPacketRequest::Create(_)),
                     ..
@@ -596,16 +601,22 @@ impl<R: CryptoRng + Rng> Vault<R> {
                     ..
                 }
                 | Rpc::Request {
-                    request: Request::LoginPacket(LoginPacketRequest::Update(..)),
+                    request: Request::Money(MoneyRequest::SimulatePayout { .. }),
                     ..
                 }
-            } else {
-                error!("{}: Logic error - unexpected RPC.", self);
-                None
-            }
-        } else {
-            None
+                | Rpc::Request {
+                    request: Request::LoginPacket(LoginPacketRequest::Update(..)),
+                    ..
+                } => self
+                    .client_handler_mut()?
+                    .handle_vault_rpc(requester_name, rpc),
+                _data_request => self.data_handler_mut()?.handle_vault_rpc(
+                    SrcLocation::Node(routing::XorName(rand::random())), // dummy xorname
+                    rpc,
+                ),
+            };
         }
+        None
     }
 
     fn proxy_client_request(&mut self, rpc: Rpc) -> Option<Action> {

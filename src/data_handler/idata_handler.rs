@@ -99,12 +99,14 @@ impl IDataHandler {
 
         let client_id = requester.clone();
         let respond = |result: NdResult<()>| {
+            let refund = utils::get_refund_for_put(&result);
             Some(Action::RespondToClientHandlers {
                 sender: our_name,
                 rpc: Rpc::Response {
                     requester: client_id,
                     response: Response::Mutation(result),
                     message_id,
+                    refund,
                 },
             })
         };
@@ -247,12 +249,14 @@ impl IDataHandler {
         let our_name = *self.id.name();
         let client_id = requester.clone();
         let respond = |result: NdResult<()>| {
+            let refund = utils::get_refund_for_put(&result);
             Some(Action::RespondToClientHandlers {
                 sender: our_name,
                 rpc: Rpc::Response {
                     requester: client_id.clone(),
                     response: Response::Mutation(result),
                     message_id,
+                    refund,
                 },
             })
         };
@@ -342,12 +346,14 @@ impl IDataHandler {
 
         let client_id = requester.clone();
         let respond = |result: NdResult<IData>| {
+            let refund = utils::get_refund_for_put(&result);
             Some(Action::RespondToClientHandlers {
                 sender: our_name,
                 rpc: Rpc::Response {
                     requester: client_id.clone(),
                     response: Response::GetIData(result),
                     message_id,
+                    refund,
                 },
             })
         };
@@ -488,7 +494,6 @@ impl IDataHandler {
             metadata.holders.len()
         );
 
-<<<<<<< HEAD
         // We're acting as data handler, received request from client handlers
         let mut holders_metadata = self.get_holder(sender).unwrap_or_default();
 
@@ -522,17 +527,6 @@ impl IDataHandler {
                     },
                 })
         }
-=======
-        self.remove_idata_op_if_concluded(&message_id)
-            .map(|idata_op| Action::RespondToClientHandlers {
-                sender: *idata_address.name(),
-                rpc: Rpc::Response {
-                    requester: idata_op.client().clone(),
-                    response: Response::Mutation(Ok(())),
-                    message_id,
-                },
-            })
->>>>>>> add initial at2-inspired parts
     }
 
     pub(super) fn handle_delete_unpub_idata_resp(
@@ -607,6 +601,9 @@ impl IDataHandler {
                         requester: idata_op.client().clone(),
                         response: Response::Mutation(response),
                         message_id,
+                        // Deleting data is free so, no refund
+                        // This field can be put to use when deletion is incentivised
+                        refund: None,
                     },
                 }
             })

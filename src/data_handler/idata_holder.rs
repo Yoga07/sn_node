@@ -11,7 +11,10 @@ use crate::{
 };
 use log::{error, info};
 
-use safe_nd::{Error as NdError, IData, IDataAddress, MessageId, NodePublicId, PublicId, Response};
+use safe_nd::{
+    DebitAgreementProof, Error as NdError, IData, IDataAddress, MessageId, NodePublicId, PublicId,
+    Response,
+};
 
 use std::{
     cell::Cell,
@@ -47,6 +50,7 @@ impl IDataHolder {
         data: &IData,
         requester: PublicId,
         message_id: MessageId,
+        debit_proof: DebitAgreementProof,
     ) -> Option<Action> {
         let result = if self.chunks.has(data.address()) {
             info!(
@@ -61,7 +65,7 @@ impl IDataHolder {
                 .map_err(|error| error.to_string().into())
         };
 
-        let refund = utils::get_refund_for_put(&result);
+        let refund = utils::get_refund_for_put(&result, debit_proof);
         Some(Action::RespondToOurDataHandlers {
             rpc: Rpc::Response {
                 requester,

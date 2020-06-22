@@ -22,11 +22,12 @@ use self::{
     replica_manager::ReplicaManager,
     transfers::Transfers,
 };
+#[cfg(not(feature = "simulated-payouts"))]
+use crate::utils;
 use crate::{
     action::{Action, ConsensusAction},
     chunk_store::LoginPacketChunkStore,
     rpc::Rpc,
-    utils,
     vault::Init,
     Config, Result,
 };
@@ -143,12 +144,9 @@ impl ClientHandler {
                 requester,
                 message_id,
                 refund: _,
-            } =>
-            // TODO: FIX refunding here
-            {
-                self.messaging
-                    .relay_reponse_to_client(src, &requester, response, message_id)
-            }
+            } => self
+                .messaging
+                .relay_reponse_to_client(src, &requester, response, message_id),
         }
     }
 
@@ -160,14 +158,23 @@ impl ClientHandler {
                 request,
                 client_public_id,
                 message_id,
-                cost,
+                debit_proof,
             } => {
-                let owner = utils::owner(&client_public_id)?;
-                if let Some(action) =
-                    self.transfers
-                        .pay_section(cost, *owner.public_key(), &request, message_id)
+                #[cfg(feature = "simulated-payouts")]
+                self.transfers.pay(debit_proof.signed_transfer.transfer);
+
+                #[cfg(not(feature = "simulated-payouts"))]
                 {
-                    return Some(action);
+                    let owner = utils::owner(&client_public_id)?;
+
+                    if let Some(action) = self.transfers.pay_section(
+                        debit_proof,
+                        *owner.public_key(),
+                        &request,
+                        message_id,
+                    ) {
+                        return Some(action);
+                    }
                 }
 
                 Some(Action::ForwardClientRequest(Rpc::Request {
@@ -189,14 +196,43 @@ impl ClientHandler {
                 request,
                 client_public_id,
                 message_id,
-                cost,
+                put_debit_proof,
+                optional_amount_debit_proof,
             } => {
-                let owner = utils::owner(&client_public_id)?;
-                if let Some(action) =
-                    self.transfers
-                        .pay_section(cost, *owner.public_key(), &request, message_id)
+                #[cfg(feature = "simulated-payouts")]
                 {
-                    return Some(action);
+                    self.transfers.pay(put_debit_proof.signed_transfer.transfer);
+
+                    if let Some(proof) = optional_amount_debit_proof {
+                        self.transfers.pay(proof.signed_transfer.transfer);
+                    }
+                }
+
+                #[cfg(not(feature = "simulated-payouts"))]
+                {
+                    let owner = utils::owner(&client_public_id)?;
+
+                    // Pay for Mutation
+                    if let Some(action) = self.transfers.pay_section(
+                        put_debit_proof,
+                        *owner.public_key(),
+                        &request,
+                        message_id,
+                    ) {
+                        return Some(action);
+                    }
+
+                    // Pay for optional amount
+                    if let Some(proof) = optional_amount_debit_proof {
+                        if let Some(action) = self.transfers.pay_section(
+                            proof,
+                            *owner.public_key(),
+                            &request,
+                            message_id,
+                        ) {
+                            return Some(action);
+                        }
+                    }
                 }
 
                 Some(Action::ProxyClientRequest(Rpc::Request {
@@ -288,6 +324,7 @@ impl ClientHandler {
                 req,
                 message_id,
                 &mut self.transfers,
+                &mut self.messaging,
             ),
             Money(req) => self.transfers.finalise_client_request(
                 requester,

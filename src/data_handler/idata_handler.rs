@@ -13,8 +13,8 @@ use pickledb::PickleDb;
 use rand::SeedableRng;
 use routing::Node;
 use safe_nd::{
-    Error as NdError, IData, IDataAddress, IDataRequest, MessageId, NodeFullId, NodePublicId,
-    PublicId, PublicKey, Request, Response, Result as NdResult, XorName,
+    DebitAgreementProof, Error as NdError, IData, IDataAddress, IDataRequest, MessageId,
+    NodeFullId, NodePublicId, PublicId, PublicKey, Request, Response, Result as NdResult, XorName,
 };
 use serde::{Deserialize, Serialize};
 use std::{
@@ -93,13 +93,14 @@ impl IDataHandler {
         requester: PublicId,
         data: IData,
         message_id: MessageId,
+        debit_proof: DebitAgreementProof,
     ) -> Option<Action> {
         // We're acting as data handler, received request from client handlers
         let our_name = *self.id.name();
 
         let client_id = requester.clone();
         let respond = |result: NdResult<()>| {
-            let refund = utils::get_refund_for_put(&result);
+            let refund = utils::get_refund_for_put(&result, debit_proof.clone());
             Some(Action::RespondToClientHandlers {
                 sender: our_name,
                 rpc: Rpc::Response {
@@ -161,7 +162,10 @@ impl IDataHandler {
 
         let idata_op = IDataOp::new(
             requester.clone(),
-            IDataRequest::Put(data),
+            IDataRequest::Put {
+                data,
+                debit_proof: None,
+            },
             target_holders.clone(),
         );
         let process_request_action = match self.idata_client_ops.entry(message_id) {
@@ -249,14 +253,14 @@ impl IDataHandler {
         let our_name = *self.id.name();
         let client_id = requester.clone();
         let respond = |result: NdResult<()>| {
-            let refund = utils::get_refund_for_put(&result);
             Some(Action::RespondToClientHandlers {
                 sender: our_name,
                 rpc: Rpc::Response {
                     requester: client_id.clone(),
                     response: Response::Mutation(result),
                     message_id,
-                    refund,
+                    // Deletion is free so no refund
+                    refund: None,
                 },
             })
         };
@@ -346,14 +350,13 @@ impl IDataHandler {
 
         let client_id = requester.clone();
         let respond = |result: NdResult<IData>| {
-            let refund = utils::get_refund_for_put(&result);
             Some(Action::RespondToClientHandlers {
                 sender: our_name,
                 rpc: Rpc::Response {
                     requester: client_id.clone(),
                     response: Response::GetIData(result),
                     message_id,
-                    refund,
+                    refund: None,
                 },
             })
         };
@@ -465,9 +468,10 @@ impl IDataHandler {
             if let Some(idata_put_op) = idata_op {
                 let request = idata_put_op.request();
                 metadata.owner = match request {
-                    IDataRequest::Put(IData::Unpub(_)) => {
-                        Some(*utils::own_key(idata_put_op.client())?)
-                    }
+                    IDataRequest::Put {
+                        data: IData::Unpub(_),
+                        ..
+                    } => Some(*utils::own_key(idata_put_op.client())?),
                     _ => None,
                 }
             }
@@ -647,7 +651,10 @@ impl IDataHandler {
 
                     let idata_op = IDataOp::new(
                         requester.clone(),
-                        IDataRequest::Put(idata),
+                        IDataRequest::Put {
+                            data: idata,
+                            debit_proof: None, // FIXME: refunds
+                        },
                         new_holders.clone(),
                     );
 

@@ -24,7 +24,8 @@ use sdata_handler::SDataHandler;
 use tiny_keccak::sha3_256;
 
 use safe_nd::{
-    IDataRequest, MessageId, NodeFullId, NodePublicId, PublicId, Request, Response, XorName,
+    DebitAgreementProof, IDataRequest, MessageId, NodeFullId, NodePublicId, PublicId, Request,
+    Response, XorName,
 };
 
 use std::{
@@ -84,8 +85,9 @@ impl DataHandler {
             Rpc::Response {
                 response,
                 message_id,
+                refund,
                 ..
-            } => self.handle_response(utils::get_source_name(src), response, message_id),
+            } => self.handle_response(utils::get_source_name(src), response, message_id, refund),
         }
     }
 
@@ -108,15 +110,25 @@ impl DataHandler {
         match request {
             IData(idata_req) => {
                 match idata_req {
-                    IDataRequest::Put(data) => {
+                    IDataRequest::Put { data, debit_proof } => {
                         if matches!(src, SrcLocation::Section(_)) {
                             // Since the requester is a section, this message was sent by the data handlers to us
                             // as a single data handler, implying that we're a data holder chosen to store the
                             // chunk.
-                            self.idata_holder.store_idata(&data, requester, message_id)
+                            self.idata_holder.store_idata(
+                                &data,
+                                requester,
+                                message_id,
+                                debit_proof.unwrap(),
+                            )
                         } else {
                             self.handle_idata_request(|idata_handler| {
-                                idata_handler.handle_put_idata_req(requester, data, message_id)
+                                idata_handler.handle_put_idata_req(
+                                    requester,
+                                    data,
+                                    message_id,
+                                    debit_proof.unwrap(),
+                                )
                             })
                         }
                     }
@@ -191,6 +203,7 @@ impl DataHandler {
         src: XorName,
         response: Response,
         message_id: MessageId,
+        _refund: Option<DebitAgreementProof>,
     ) -> Option<Action> {
         use Response::*;
         trace!(

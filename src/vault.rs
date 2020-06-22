@@ -21,9 +21,7 @@ use rand_chacha::ChaChaRng;
 use routing::{
     event::Event as RoutingEvent, DstLocation, Node, SrcLocation, TransportEvent as ClientEvent,
 };
-use safe_nd::{
-    ClientRequest, LoginPacketRequest, MoneyRequest, NodeFullId, Request, Response, XorName,
-};
+use safe_nd::{ClientRequest, LoginPacketRequest, NodeFullId, Request, Response, XorName};
 use std::borrow::Cow;
 use std::{
     cell::{Cell, RefCell},
@@ -586,7 +584,7 @@ impl<R: CryptoRng + Rng> Vault<R> {
             //        message.
             return match rpc.clone() {
                 Rpc::Request {
-                    request: Request::LoginPacket(LoginPacketRequest::Create(_)),
+                    request: Request::LoginPacket(LoginPacketRequest::Create { .. }),
                     ..
                 }
                 | Rpc::Request {

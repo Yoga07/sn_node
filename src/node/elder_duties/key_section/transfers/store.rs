@@ -6,9 +6,9 @@
 // KIND, either express or implied. Please review the Licences for the specific language governing
 // permissions and limitations relating to use of the SAFE Network Software.
 
+use crate::vault_data_types::{AccountId, ReplicaEvent};
 use crate::{node::state_db::Init, to_db_key::from_db_key, utils, Error, Result, ToDbKey};
 use pickledb::PickleDb;
-use safe_nd::{AccountId, ReplicaEvent};
 use std::{collections::BTreeSet, path::Path};
 
 const TRANSFERS_DB_NAME: &str = "transfers.db";
@@ -139,9 +139,9 @@ impl TransferStore {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::vault_data_types::{PublicKey, TransferPropagated};
     use crate::Result;
     use bls::SecretKey;
-    use safe_nd::{PublicKey, TransferPropagated};
     use safe_transfers::get_genesis;
     use tempdir::TempDir;
 
@@ -189,8 +189,8 @@ mod test {
         PublicKey::from(SecretKey::random().public_key())
     }
 
+    use crate::vault_data_types::SignatureShare;
     use bls::SecretKeyShare;
-    use safe_nd::SignatureShare;
     fn dummy_sig() -> SignatureShare {
         let dummy_shares = SecretKeyShare::default();
         let dummy_sig = dummy_shares.sign("DUMMY MSG");

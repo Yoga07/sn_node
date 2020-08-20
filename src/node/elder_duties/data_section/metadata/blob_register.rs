@@ -6,6 +6,10 @@
 // KIND, either express or implied. Please review the Licences for the specific language governing
 // permissions and limitations relating to use of the SAFE Network Software.
 
+use crate::vault_data_types::{
+    Blob, BlobAddress, BlobRead, BlobWrite, CmdError, Error as NdError, Message, MessageId,
+    MsgEnvelope, NodeCmd, NodeDataCmd, PublicKey, QueryResponse, Result as NdResult,
+};
 use crate::{
     node::msg_wrapping::ElderMsgWrapping,
     node::node_ops::{MessagingDuty, NodeOperation},
@@ -14,10 +18,6 @@ use crate::{
 };
 use log::{info, trace, warn};
 use pickledb::PickleDb;
-use safe_nd::{
-    Blob, BlobAddress, BlobRead, BlobWrite, CmdError, Error as NdError, Message, MessageId,
-    MsgEnvelope, NodeCmd, NodeDataCmd, PublicKey, QueryResponse, Result as NdResult,
-};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},

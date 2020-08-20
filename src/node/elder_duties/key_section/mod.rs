@@ -17,6 +17,7 @@ use self::{
     payment::Payments,
     transfers::{replica_manager::ReplicaManager, store::TransferStore, Transfers},
 };
+use crate::vault_data_types::AccountId;
 use crate::{
     node::node_ops::{KeySectionDuty, NodeOperation},
     node::state_db::NodeInfo,
@@ -24,7 +25,6 @@ use crate::{
 };
 use rand::{CryptoRng, Rng};
 use routing::{Prefix, RoutingError};
-use safe_nd::AccountId;
 use std::{cell::RefCell, collections::BTreeSet, rc::Rc};
 use xor_name::XorName;
 

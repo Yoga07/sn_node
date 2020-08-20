@@ -6,12 +6,12 @@
 // KIND, either express or implied. Please review the Licences for the specific language governing
 // permissions and limitations relating to use of the SAFE Network Software.
 
-use crate::{node::keys::NodeSigningKeys, node::node_ops::MessagingDuty, utils};
-use log::info;
-use safe_nd::{
+use crate::vault_data_types::{
     Address, AdultDuties, CmdError, Duty, ElderDuties, Message, MessageId, MsgEnvelope, MsgSender,
     NodeDuties,
 };
+use crate::{node::keys::NodeSigningKeys, node::node_ops::MessagingDuty, utils};
+use log::info;
 use xor_name::XorName;
 
 use serde::Serialize;

@@ -7,13 +7,13 @@
 // permissions and limitations relating to use of the SAFE Network Software.
 
 use super::validator::Validator;
+use crate::vault_data_types::{
+    AccountId, DebitAgreementProof, Message, MessageId, Money, NodeCmd, NodeTransferCmd, Result,
+    TransferValidated,
+};
 use crate::{
     node::msg_wrapping::ElderMsgWrapping,
     node::node_ops::{MessagingDuty, NodeOperation},
-};
-use safe_nd::{
-    AccountId, DebitAgreementProof, Message, MessageId, Money, NodeCmd, NodeTransferCmd, Result,
-    TransferValidated,
 };
 use xor_name::XorName;
 
@@ -241,7 +241,7 @@ impl SectionFunds {
             panic!("You failed to implement the logic correctly. Go back to the drawing desk.")
         }
 
-        use safe_nd::ReplicaEvent::*;
+        use crate::vault_data_types::ReplicaEvent::*;
         // Set the next actor to be our current.
         self.actor = self.state.next_actor.take().unwrap();
         // We checked above that next_actor was some,
@@ -284,8 +284,8 @@ impl SectionFunds {
     }
 }
 
+use crate::vault_data_types::SignatureShare;
 use bls::SecretKeyShare;
-use safe_nd::SignatureShare;
 fn dummy_sig() -> SignatureShare {
     let dummy_shares = SecretKeyShare::default();
     let dummy_sig = dummy_shares.sign("DUMMY MSG");

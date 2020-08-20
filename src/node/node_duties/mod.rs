@@ -19,12 +19,12 @@ use crate::node::{
     node_ops::{NodeDuty, NodeOperation},
     state_db::NodeInfo,
 };
+use crate::vault_data_types::{Message, MessageId, NodeCmd, NodeSystemCmd, PublicKey};
 use crate::Network;
 use log::{info, warn};
 use msg_analysis::NetworkMsgAnalysis;
 use network_events::NetworkEvents;
 use rand::{CryptoRng, Rng};
-use safe_nd::{Message, MessageId, NodeCmd, NodeSystemCmd, PublicKey};
 use std::{cell::Cell, rc::Rc};
 
 #[allow(clippy::large_enum_variant)]

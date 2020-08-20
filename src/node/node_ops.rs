@@ -7,13 +7,13 @@
 // permissions and limitations relating to use of the SAFE Network Software.
 
 #[cfg(feature = "simulated-payouts")]
-use safe_nd::Transfer;
+use crate::vault_data_types::Transfer;
 
-use routing::{event::Event as NetworkEvent, Prefix, TransportEvent as ClientEvent};
-use safe_nd::{
+use crate::vault_data_types::{
     AccountId, Address, DebitAgreementProof, HandshakeResponse, MessageId, MsgEnvelope, PublicKey,
     ReplicaEvent, SignedTransfer, TransferValidated,
 };
+use routing::{event::Event as NetworkEvent, Prefix, TransportEvent as ClientEvent};
 use serde::export::Formatter;
 use std::fmt::Debug;
 use std::{collections::BTreeSet, net::SocketAddr};

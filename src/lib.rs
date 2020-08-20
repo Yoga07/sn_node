@@ -37,6 +37,7 @@ mod node;
 mod to_db_key;
 mod utils;
 
+pub(crate) use safe_nd as vault_data_types;
 pub(crate) use to_db_key::ToDbKey;
 
 pub use crate::{

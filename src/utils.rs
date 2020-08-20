@@ -6,12 +6,12 @@
 // KIND, either express or implied. Please review the Licences for the specific language governing
 // permissions and limitations relating to use of the SAFE Network Software.
 
+use crate::vault_data_types::{BlsKeypairShare, Keypair};
 use crate::{node::state_db::Init, Network, Result};
 use bls::{self, serde_impl::SerdeSecret};
 use log::{error, trace};
 use pickledb::{PickleDb, PickleDbDumpPolicy};
 use rand::{distributions::Standard, CryptoRng, Rng};
-use safe_nd::{BlsKeypairShare, Keypair};
 use serde::{de::DeserializeOwned, Serialize};
 use std::{fs, path::Path};
 use unwrap::unwrap;

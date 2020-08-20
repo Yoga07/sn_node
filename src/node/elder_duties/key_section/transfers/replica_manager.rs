@@ -7,14 +7,14 @@
 // permissions and limitations relating to use of the SAFE Network Software.
 
 use super::store::TransferStore;
-use crate::Result;
-use bls::{PublicKeySet, SecretKeyShare};
-use log::info;
-use safe_nd::{
+use crate::vault_data_types::{
     AccountId, DebitAgreementProof, Error as NdError, Money, PublicKey as NdPublicKey, PublicKey,
     ReplicaEvent, Result as NdResult, SignedTransfer, TransferPropagated, TransferRegistered,
     TransferValidated,
 };
+use crate::Result;
+use bls::{PublicKeySet, SecretKeyShare};
+use log::info;
 use safe_transfers::{get_genesis, TransferReplica as Replica};
 use std::collections::BTreeSet;
 

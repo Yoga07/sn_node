@@ -8,10 +8,10 @@
 
 use super::msg_analysis::NetworkMsgAnalysis;
 use crate::node::node_ops::{ElderDuty, NodeDuty, NodeOperation};
+use crate::vault_data_types::{MsgEnvelope, PublicKey};
 use hex_fmt::HexFmt;
 use log::{error, info, trace, warn};
 use routing::event::Event as RoutingEvent;
-use safe_nd::{MsgEnvelope, PublicKey};
 
 use xor_name::XorName;
 

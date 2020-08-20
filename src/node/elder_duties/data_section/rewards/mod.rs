@@ -11,16 +11,16 @@ mod validator;
 
 use self::section_funds::{Payout, SectionFunds};
 pub use self::validator::Validator;
+use crate::vault_data_types::{
+    AccountId, Address, ElderDuties, Error, Message, MessageId, Money, NodeQuery,
+    NodeQueryResponse, NodeRewardQuery, NodeRewardQueryResponse,
+};
 use crate::{
     node::keys::NodeSigningKeys,
     node::msg_wrapping::ElderMsgWrapping,
     node::node_ops::{MessagingDuty, NodeOperation, RewardDuty},
 };
 use log::{info, warn};
-use safe_nd::{
-    AccountId, Address, ElderDuties, Error, Message, MessageId, Money, NodeQuery,
-    NodeQueryResponse, NodeRewardQuery, NodeRewardQueryResponse,
-};
 use safe_transfers::TransferActor;
 use std::collections::{BTreeSet, HashMap};
 use xor_name::XorName;

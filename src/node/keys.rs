@@ -6,9 +6,11 @@
 // KIND, either express or implied. Please review the Licences for the specific language governing
 // permissions and limitations relating to use of the SAFE Network Software.
 
+use crate::vault_data_types::{
+    BlsProof, BlsProofShare, Ed25519Proof, Proof, PublicKey, Signature, SignatureShare,
+};
 use crate::{utils, Network};
 use bls::PublicKeySet;
-use safe_nd::{BlsProof, BlsProofShare, Ed25519Proof, Proof, PublicKey, Signature, SignatureShare};
 use serde::Serialize;
 
 #[derive(Clone)]

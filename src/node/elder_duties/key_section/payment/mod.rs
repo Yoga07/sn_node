@@ -7,15 +7,15 @@
 // permissions and limitations relating to use of the SAFE Network Software.
 
 use super::transfers::replica_manager::ReplicaManager;
+use crate::vault_data_types::{
+    Cmd, CmdError, ElderDuties, Error, Message, Money, MsgEnvelope, PublicKey, Result,
+    TransferError,
+};
 use crate::{
     node::keys::NodeSigningKeys,
     node::msg_wrapping::ElderMsgWrapping,
     node::node_ops::{NodeOperation, PaymentDuty},
     utils,
-};
-use safe_nd::{
-    Cmd, CmdError, ElderDuties, Error, Message, Money, MsgEnvelope, PublicKey, Result,
-    TransferError,
 };
 use std::{
     cell::{RefCell, RefMut},

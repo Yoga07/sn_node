@@ -7,10 +7,10 @@
 // permissions and limitations relating to use of the SAFE Network Software.
 
 use crate::node::node_ops::MessagingDuty;
+use crate::vault_data_types::{HandshakeRequest, HandshakeResponse, PublicKey, Signature};
 use crate::{utils, Network};
 use log::{debug, info, trace};
 use rand::{CryptoRng, Rng};
-use safe_nd::{HandshakeRequest, HandshakeResponse, PublicKey, Signature};
 use std::{
     collections::HashMap,
     fmt::{self, Display, Formatter},

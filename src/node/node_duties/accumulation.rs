@@ -7,8 +7,8 @@
 // permissions and limitations relating to use of the SAFE Network Software.
 
 use crate::utils;
+use crate::vault_data_types::{BlsProof, MessageId, MsgEnvelope, MsgSender, Proof, SignatureShare};
 use log::{error, info};
-use safe_nd::{BlsProof, MessageId, MsgEnvelope, MsgSender, Proof, SignatureShare};
 use std::collections::{hash_map::Entry, HashMap, HashSet};
 
 type RequestInfo = (MsgEnvelope, MsgSender, Vec<SignatureShare>);

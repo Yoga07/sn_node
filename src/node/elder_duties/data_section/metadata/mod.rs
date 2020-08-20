@@ -14,6 +14,7 @@ mod reading;
 mod sequence_storage;
 mod writing;
 
+use crate::vault_data_types::{Cmd, ElderDuties, Message, MsgEnvelope, Query};
 use crate::{
     node::msg_wrapping::ElderMsgWrapping,
     node::node_ops::{MetadataDuty, NodeOperation},
@@ -25,7 +26,6 @@ use blob_register::BlobRegister;
 use elder_stores::ElderStores;
 use map_storage::MapStorage;
 use reading::Reading;
-use safe_nd::{Cmd, ElderDuties, Message, MsgEnvelope, Query};
 use sequence_storage::SequenceStorage;
 use std::{
     cell::Cell,

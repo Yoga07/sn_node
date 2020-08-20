@@ -8,8 +8,8 @@
 
 use super::chunk_storage::ChunkStorage;
 use crate::node::node_ops::MessagingDuty;
+use crate::vault_data_types::{Address, BlobRead, MsgEnvelope, MsgSender};
 use log::error;
-use safe_nd::{Address, BlobRead, MsgEnvelope, MsgSender};
 
 /// Read operations on data chunks.
 pub(super) struct Reading {

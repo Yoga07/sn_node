@@ -10,16 +10,16 @@ pub mod replica_manager;
 pub mod store;
 
 pub use self::replica_manager::ReplicaManager;
-use crate::{
-    node::keys::NodeSigningKeys,
-    node::msg_wrapping::ElderMsgWrapping,
-    node::node_ops::{MessagingDuty, NodeOperation, TransferCmd, TransferDuty, TransferQuery},
-};
-use safe_nd::{
+use crate::vault_data_types::{
     Address, CmdError, DebitAgreementProof, ElderDuties, Error, Event, Message, MessageId, NodeCmd,
     NodeCmdError, NodeEvent, NodeQuery, NodeQueryResponse, NodeTransferCmd, NodeTransferError,
     NodeTransferQuery, NodeTransferQueryResponse, PublicKey, QueryResponse, ReplicaEvent,
     SignedTransfer, TransferError,
+};
+use crate::{
+    node::keys::NodeSigningKeys,
+    node::msg_wrapping::ElderMsgWrapping,
+    node::node_ops::{MessagingDuty, NodeOperation, TransferCmd, TransferDuty, TransferQuery},
 };
 use std::{
     cell::RefCell,
@@ -28,7 +28,7 @@ use std::{
 };
 
 #[cfg(feature = "simulated-payouts")]
-use safe_nd::Transfer;
+use crate::vault_data_types::Transfer;
 /*
 Transfers is the layer that manages
 interaction with an AT2 Replica.

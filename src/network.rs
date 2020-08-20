@@ -7,6 +7,7 @@
 // permissions and limitations relating to use of the SAFE Network Software.
 
 use crate::node::state_db::AgeGroup;
+use crate::vault_data_types::PublicKey;
 use crate::{Error, Result};
 use bytes::Bytes;
 use crossbeam_channel::RecvError;
@@ -14,7 +15,6 @@ use routing::{
     DstLocation, Node as RoutingLayer, P2pNode, PublicId, RoutingError, SectionProofChain,
     SrcLocation,
 };
-use safe_nd::PublicKey;
 use std::collections::BTreeSet;
 use std::{cell::RefCell, net::SocketAddr, rc::Rc};
 use xor_name::{Prefix, XorName};

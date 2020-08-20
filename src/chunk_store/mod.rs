@@ -18,11 +18,11 @@ mod sequence;
 mod tests;
 mod used_space;
 
+use crate::vault_data_types::{Account, Blob, Map, Sequence};
 use crate::{node::state_db::Init, utils};
 use chunk::{Chunk, ChunkId};
 use error::{Error, Result};
 use log::trace;
-use safe_nd::{Account, Blob, Map, Sequence};
 use std::{
     cell::Cell,
     fs::{self, DirEntry, File, Metadata},

@@ -9,9 +9,11 @@
 pub use super::client_input_parse::{try_deserialize_handshake, try_deserialize_msg};
 pub use super::onboarding::Onboarding;
 use crate::node::node_ops::MessagingDuty;
+use crate::vault_data_types::{
+    Address, HandshakeRequest, Message, MessageId, MsgEnvelope, PublicKey,
+};
 use log::{error, info, warn};
 use rand::{CryptoRng, Rng};
-use safe_nd::{Address, HandshakeRequest, Message, MessageId, MsgEnvelope, PublicKey};
 use std::{
     collections::{hash_map::Entry, HashMap},
     fmt::{self, Display, Formatter},

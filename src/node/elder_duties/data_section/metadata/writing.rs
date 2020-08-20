@@ -11,7 +11,9 @@ use super::{
     map_storage::MapStorage, sequence_storage::SequenceStorage,
 };
 use crate::node::node_ops::{MessagingDuty, NodeOperation};
-use safe_nd::{AccountWrite, BlobWrite, DataCmd, MapWrite, MsgEnvelope, SequenceWrite};
+use crate::vault_data_types::{
+    AccountWrite, BlobWrite, DataCmd, MapWrite, MsgEnvelope, SequenceWrite,
+};
 
 /// Write operations on data.
 pub(super) struct Writing {

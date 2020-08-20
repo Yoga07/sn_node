@@ -8,8 +8,8 @@
 
 use super::chunk_storage::ChunkStorage;
 use crate::node::node_ops::MessagingDuty;
+use crate::vault_data_types::{BlobWrite, MsgEnvelope, MsgSender};
 use log::error;
-use safe_nd::{BlobWrite, MsgEnvelope, MsgSender};
 
 /// Write operations on data chunks.
 pub(super) struct Writing {

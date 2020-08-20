@@ -11,13 +11,13 @@ use crate::node::node_ops::{
     AdultDuty, ChunkDuty, GatewayDuty, MessagingDuty, MetadataDuty, NodeOperation, RewardDuty,
     TransferCmd, TransferDuty, TransferQuery,
 };
-use crate::Network;
-use log::error;
-use safe_nd::{
+use crate::vault_data_types::{
     Address, Cmd, DataCmd, DataQuery, Duty, ElderDuties, Message, MsgEnvelope, MsgSender, NodeCmd,
     NodeDuties, NodeEvent, NodeQuery, NodeQueryResponse, NodeRewardQuery, NodeRewardQueryResponse,
     NodeSystemCmd, NodeTransferCmd, NodeTransferQuery, NodeTransferQueryResponse, Query,
 };
+use crate::Network;
+use log::error;
 use xor_name::XorName;
 
 // NB: This approach is not entirely good, so will be improved.

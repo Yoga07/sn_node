@@ -6,17 +6,17 @@
 // KIND, either express or implied. Please review the Licences for the specific language governing
 // permissions and limitations relating to use of the SAFE Network Software.
 
+use crate::vault_data_types::{
+    CmdError, Error as NdError, Map, MapAction, MapAddress, MapEntryActions, MapPermissionSet,
+    MapRead, MapValue, MapWrite, Message, MessageId, MsgEnvelope, MsgSender, PublicKey,
+    QueryResponse, Result as NdResult,
+};
 use crate::{
     chunk_store::{error::Error as ChunkStoreError, MapChunkStore},
     node::msg_wrapping::ElderMsgWrapping,
     node::node_ops::MessagingDuty,
     node::state_db::NodeInfo,
     Result,
-};
-use safe_nd::{
-    CmdError, Error as NdError, Map, MapAction, MapAddress, MapEntryActions, MapPermissionSet,
-    MapRead, MapValue, MapWrite, Message, MessageId, MsgEnvelope, MsgSender, PublicKey,
-    QueryResponse, Result as NdResult,
 };
 use std::{
     cell::Cell,

@@ -6,18 +6,18 @@
 // KIND, either express or implied. Please review the Licences for the specific language governing
 // permissions and limitations relating to use of the SAFE Network Software.
 
+use crate::vault_data_types::{
+    CmdError, Error as NdError, Message, MessageId, MsgSender, QueryResponse, Result as NdResult,
+    Sequence, SequenceAction, SequenceAddress, SequenceEntry, SequenceIndex, SequenceOwner,
+    SequencePermissions, SequencePrivatePermissions, SequencePublicPermissions, SequenceRead,
+    SequenceUser, SequenceWrite, SequenceWriteOp,
+};
 use crate::{
     chunk_store::{error::Error as ChunkStoreError, SequenceChunkStore},
     node::msg_wrapping::ElderMsgWrapping,
     node::node_ops::MessagingDuty,
     node::state_db::NodeInfo,
     Result,
-};
-use safe_nd::{
-    CmdError, Error as NdError, Message, MessageId, MsgSender, QueryResponse, Result as NdResult,
-    Sequence, SequenceAction, SequenceAddress, SequenceEntry, SequenceIndex, SequenceOwner,
-    SequencePermissions, SequencePrivatePermissions, SequencePublicPermissions, SequenceRead,
-    SequenceUser, SequenceWrite, SequenceWriteOp,
 };
 use std::{
     cell::Cell,

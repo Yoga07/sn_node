@@ -23,8 +23,8 @@ use log::{error, info, trace, warn};
 use rand::{CryptoRng, Rng, SeedableRng};
 use rand_chacha::ChaChaRng;
 
+use crate::vault_data_types::{Address, MsgEnvelope, MsgSender};
 use routing::TransportEvent as ClientEvent;
-use safe_nd::{Address, MsgEnvelope, MsgSender};
 use std::fmt::{self, Display, Formatter};
 
 /// A client gateway routes messages

@@ -6,7 +6,7 @@
 // KIND, either express or implied. Please review the Licences for the specific language governing
 // permissions and limitations relating to use of the SAFE Network Software.
 
-use safe_nd::PublicKey;
+use crate::vault_data_types::PublicKey;
 use safe_transfers::ReplicaValidator;
 
 /// Should be validating

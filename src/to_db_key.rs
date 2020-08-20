@@ -7,7 +7,9 @@
 // permissions and limitations relating to use of the SAFE Network Software.
 
 use crate::utils;
-use safe_nd::{BlobAddress, ClientPublicId, MapAddress, PublicId, PublicKey, SequenceAddress};
+use crate::vault_data_types::{
+    BlobAddress, ClientPublicId, MapAddress, PublicId, PublicKey, SequenceAddress,
+};
 use serde::{de::DeserializeOwned, Serialize};
 use xor_name::XorName;
 
@@ -36,9 +38,9 @@ impl ToDbKey for XorName {}
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::vault_data_types::PublicKey;
     use crate::Result;
     use bls::SecretKey;
-    use safe_nd::PublicKey;
 
     #[test]
     fn to_from_db_key() -> Result<()> {

@@ -15,8 +15,8 @@ use chunk_storage::ChunkStorage;
 use reading::Reading;
 use writing::Writing;
 
+use crate::vault_data_types::{Cmd, DataCmd, DataQuery, Message, MsgEnvelope, Query};
 use log::trace;
-use safe_nd::{Cmd, DataCmd, DataQuery, Message, MsgEnvelope, Query};
 
 use std::{
     cell::Cell,

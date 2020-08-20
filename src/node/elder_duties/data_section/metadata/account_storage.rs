@@ -6,16 +6,16 @@
 // KIND, either express or implied. Please review the Licences for the specific language governing
 // permissions and limitations relating to use of the SAFE Network Software.
 
+use crate::vault_data_types::{
+    Account, AccountRead, AccountWrite, CmdError, Error as NdError, Message, MessageId, MsgSender,
+    PublicKey, QueryResponse, Result as NdResult,
+};
 use crate::{
     chunk_store::{error::Error as ChunkStoreError, AccountChunkStore},
     node::msg_wrapping::ElderMsgWrapping,
     node::node_ops::MessagingDuty,
     node::state_db::NodeInfo,
     Result,
-};
-use safe_nd::{
-    Account, AccountRead, AccountWrite, CmdError, Error as NdError, Message, MessageId, MsgSender,
-    PublicKey, QueryResponse, Result as NdResult,
 };
 use std::{
     cell::Cell,

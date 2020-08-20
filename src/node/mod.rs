@@ -17,6 +17,7 @@ mod node_ops;
 
 pub use crate::node::node_duties::messaging::Receiver;
 pub use crate::node::state_db::{Command, Init};
+use crate::vault_data_types::PublicKey;
 use crate::{
     node::{
         keys::NodeSigningKeys,
@@ -29,7 +30,6 @@ use crate::{
 use bls::SecretKey;
 use log::{info, warn};
 use rand::{CryptoRng, Rng};
-use safe_nd::PublicKey;
 use std::{
     fmt::{self, Display, Formatter},
     net::SocketAddr,

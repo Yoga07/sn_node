@@ -6,10 +6,10 @@
 // KIND, either express or implied. Please review the Licences for the specific language governing
 // permissions and limitations relating to use of the SAFE Network Software.
 
+use crate::vault_data_types::{Address, HandshakeResponse, MsgEnvelope};
 use crate::{node::node_ops::MessagingDuty, utils, Network};
 use bytes::Bytes;
 use log::{info, warn};
-use safe_nd::{Address, HandshakeResponse, MsgEnvelope};
 use serde::Serialize;
 use std::{
     fmt::{self, Display, Formatter},

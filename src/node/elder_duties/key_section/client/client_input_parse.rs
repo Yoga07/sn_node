@@ -6,9 +6,9 @@
 // KIND, either express or implied. Please review the Licences for the specific language governing
 // permissions and limitations relating to use of the SAFE Network Software.
 
+use crate::vault_data_types::{HandshakeRequest, Message, MsgEnvelope, MsgSender};
 use bytes::Bytes;
 use log::info;
-use safe_nd::{HandshakeRequest, Message, MsgEnvelope, MsgSender};
 use std::net::SocketAddr;
 
 /*

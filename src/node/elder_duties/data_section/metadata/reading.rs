@@ -11,7 +11,9 @@ use super::{
     map_storage::MapStorage, sequence_storage::SequenceStorage,
 };
 use crate::node::node_ops::MessagingDuty;
-use safe_nd::{AccountRead, BlobRead, DataQuery, MapRead, MsgEnvelope, SequenceRead};
+use crate::vault_data_types::{
+    AccountRead, BlobRead, DataQuery, MapRead, MsgEnvelope, SequenceRead,
+};
 
 /// Read operations on data.
 pub(super) struct Reading {

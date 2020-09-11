@@ -10,8 +10,8 @@ use crate::node::state_db::AgeGroup;
 use crate::{Config as NodeConfig, Error, Result};
 use bytes::Bytes;
 use routing::{
-    DstLocation, EventStream, Node as RoutingNode, NodeConfig as RoutingConfig, PublicId,
-    RoutingError, SectionProofChain, SrcLocation,
+    DstLocation, Error as RoutingError, EventStream, Node as RoutingNode,
+    NodeConfig as RoutingConfig, PublicId, SectionProofChain, SrcLocation,
 };
 use sn_data_types::PublicKey;
 use std::collections::BTreeSet;

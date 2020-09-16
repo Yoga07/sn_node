@@ -127,12 +127,6 @@ impl Transfers {
         use TransferCmd::*;
         match cmd {
             InitiateReplica(events) => self.initiate_replica(events),
-            #[cfg(feature = "simulated-payouts")]
-            // Cmd to simulate a farming payout
-            SimulatePayout(transfer) => self
-                .replica
-                .borrow_mut()
-                .credit_without_proof(transfer.clone()),
             ValidateTransfer(signed_transfer) => {
                 self.validate(signed_transfer.clone(), msg_id, origin)
             }
@@ -145,6 +139,12 @@ impl Transfers {
             PropagateTransfer(debit_agreement) => {
                 self.receive_propagated(&debit_agreement, msg_id, origin)
             }
+            #[cfg(feature = "simulated-payouts")]
+            // Cmd to simulate a farming payout
+            SimulatePayout(transfer) => self
+                .replica
+                .borrow_mut()
+                .credit_without_proof(transfer.clone()),
         }
     }
 
@@ -181,6 +181,7 @@ impl Transfers {
         msg_id: MessageId,
         origin: Address,
     ) -> Option<MessagingDuty> {
+        trace!("Getting Replica Keys");
         // validate signature
         let result = match self.replica.borrow().replicas_pk_set() {
             None => Err(Error::NoSuchKey),

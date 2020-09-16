@@ -50,7 +50,7 @@ pub fn get_age_group(root_dir: &Path) -> Result<Option<AgeGroup>> {
 
 /// A node is within one
 /// out of three age groups.
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub enum AgeGroup {
     Infant,
     Adult,

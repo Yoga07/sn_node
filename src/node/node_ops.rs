@@ -516,9 +516,6 @@ pub enum TransferCmd {
     /// Initiates a new Replica with the
     /// state of existing Replicas in the group.
     InitiateReplica(Vec<ReplicaEvent>),
-    #[cfg(feature = "simulated-payouts")]
-    /// Cmd to simulate a farming payout
-    SimulatePayout(Transfer),
     /// The cmd to validate a transfer.
     ValidateTransfer(SignedTransfer),
     /// The cmd to register the consensused transfer.
@@ -530,6 +527,9 @@ pub enum TransferCmd {
     ValidateSectionPayout(SignedTransfer),
     /// The registration of a section transfer.
     RegisterSectionPayout(DebitAgreementProof),
+    #[cfg(feature = "simulated-payouts")]
+    /// Cmd to simulate a farming payout
+    SimulatePayout(Transfer),
 }
 
 impl From<sn_data_types::TransferCmd> for TransferCmd {

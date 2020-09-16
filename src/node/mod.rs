@@ -48,8 +48,12 @@ impl<R: CryptoRng + Rng> Node<R> {
         let root_dir = root_dir_buf.as_path();
 
         let reward_key = match config.wallet_id() {
-            Some(public_key) => PublicKey::Bls(state_db::pk_from_hex(public_key)?),
+            Some(public_key) => {
+                info!("Using provided existing reward wallet key");
+                PublicKey::Bls(state_db::pk_from_hex(public_key)?)
+            }
             None => {
+                info!("Creating new reward wallet key");
                 let secret = SecretKey::random();
                 let public = secret.public_key();
                 store_new_reward_keypair(root_dir, &secret, &public)?;
@@ -57,8 +61,10 @@ impl<R: CryptoRng + Rng> Node<R> {
             }
         };
         let age_group = if let Some(age_group) = get_age_group(&root_dir)? {
+            info!("AgeGroup identified! Joining as {:?}", age_group);
             age_group
         } else {
+            info!("Initializing as Infant");
             let age_group = Infant;
             store_age_group(root_dir, &age_group)?;
             age_group

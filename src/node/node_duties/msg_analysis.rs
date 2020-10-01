@@ -12,7 +12,7 @@ use crate::node::node_ops::{
     TransferCmd, TransferDuty, TransferQuery,
 };
 use crate::Network;
-use log::error;
+use log::{info, error};
 use sn_data_types::{
     Address, Cmd, DataCmd, DataQuery, Duty, ElderDuties, Message, MsgEnvelope, MsgSender, NodeCmd,
     NodeDuties, NodeEvent, NodeQuery, NodeQueryResponse, NodeRewardQuery, NodeRewardQueryResponse,
@@ -424,6 +424,7 @@ impl NetworkMsgAnalysis {
                     // This comparison is a good example of the need to use `lazy messaging`,
                     // as to handle that the expected public key is not the same as the current.
                     if section_key == &self.routing.public_key().await? && *requester != our_name {
+                        info!("PROCESSING GetReplicaEvents Query for requester: {:?}", requester);
                         Some(TransferDuty::ProcessQuery {
                             query: TransferQuery::GetReplicaEvents,
                             msg_id: *id,
@@ -440,11 +441,14 @@ impl NetworkMsgAnalysis {
                         )),
                     id,
                     ..
-                } => Some(TransferDuty::ProcessCmd {
-                    cmd: TransferCmd::InitiateReplica(events.clone().ok()?),
-                    msg_id: *id,
-                    origin: msg.origin.address(),
-                }),
+                } => {
+                    info!("Got NodeTransferQueryResponse, Initiating Replica");
+                    Some(TransferDuty::ProcessCmd {
+                        cmd: TransferCmd::InitiateReplica(events.clone().ok()?),
+                        msg_id: *id,
+                        origin: msg.origin.address(),
+                    })
+                },
                 _ => None,
             };
         }

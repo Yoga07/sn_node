@@ -16,7 +16,7 @@ use crate::{
     node::node_ops::{NodeMessagingDuty, NodeOperation, TransferCmd, TransferDuty, TransferQuery},
 };
 use futures::lock::Mutex;
-use log::{debug, error, trace};
+use log::{debug, error, info, trace};
 #[cfg(feature = "simulated-payouts")]
 use sn_data_types::Transfer;
 use sn_data_types::{
@@ -168,9 +168,12 @@ impl Transfers {
     async fn initiate_replica(&mut self, events: &[ReplicaEvent]) -> Option<NodeMessagingDuty> {
         // We must be able to initiate the replica, otherwise this node cannot function.
         match self.replica.lock().await.initiate(events) {
-            Ok(()) => None,
+            Ok(()) => {
+                info!("Done initiating Replica");
+                None
+            },
             Err(e) => {
-                error!("{}", e);
+                error!("Problem initiating Replica: {}", e);
                 panic!(e); // Temporary brittle solution before lazy messaging impl.
             }
         }

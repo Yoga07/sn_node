@@ -117,12 +117,20 @@ impl ReplicaManager {
     /// are supposed to be passed in. Without them, this Replica will
     /// not be able to function properly together with the others.
     pub(crate) fn initiate(&mut self, events: &[ReplicaEvent]) -> NdResult<()> {
+        // Do nothing if we have already initiated, genesis node is an exception.
+        if self.all_events().is_some() && self.info.section_proof_chain.len() > 1 {
+            if self.all_events().unwrap() == events {
+                return Ok(())
+            }
+        }
+        info!("Initiating replica");
         if !self.info.initiating {
             warn!("Is not initiating");
             // can only synch while initiating
             return Err(NdError::InvalidOperation);
         }
         if events.is_empty() {
+            info!("No past events found, initiating a fresh instance.");
             // This means we are the first node in the network.
             let balance = u32::MAX as u64 * 1_000_000_000;
             let debit_proof = get_genesis(
@@ -142,6 +150,7 @@ impl ReplicaManager {
                 }
             };
         } else {
+            info!("Using existing events to initiate");
             let existing_events = self
                 .store
                 .try_load()
@@ -167,6 +176,7 @@ impl ReplicaManager {
             )?;
         }
         // make sure to indicate that we are no longer initiating
+        info!("Setting info.initiating to false");
         self.info.initiating = false;
         Ok(())
     }

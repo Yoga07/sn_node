@@ -110,7 +110,7 @@ impl NetworkMsgAnalysis {
         let accumulate = self.should_accumulate_for_metadata_write(msg).await? // Metadata Elders accumulate the msgs from Payment Elders.
         // Incoming msg from `Metadata`!
         || self.should_accumulate_for_adult(msg).await? // Adults accumulate the msgs from Metadata Elders.
-        || self.should_accumulate_for_rewards(msg).await?; // Rewards Elders accumulate the claim counter cmd from other Rewards Elders
+        || self.should_accumulate_for_rewards(msg).await?; // Rewards Elders accumulate the GetWalletId query from other Rewards Elders
         Some(accumulate)
     }
 
@@ -147,8 +147,14 @@ impl NetworkMsgAnalysis {
                 ..
             })
         };
+        let is_accumulating_reward_queryresponse = || {
+            matches!(msg.message, Message::NodeQueryResponse {
+                response: NodeQueryResponse::Rewards(NodeRewardQueryResponse::GetWalletId { .. }),
+                ..
+            })
+        };
 
-        let accumulate = is_accumulating_reward_query()
+        let accumulate = (is_accumulating_reward_query() || is_accumulating_reward_queryresponse())
             && from_single_rewards_elder()
             && self.is_dst_for(msg).await?
             && self.is_elder().await;
@@ -340,19 +346,11 @@ impl NetworkMsgAnalysis {
 
         // SectionPayoutValidated and GetWalletId
         // do not need accumulation since they are accumulated in the domain logic.
-        use NodeRewardQueryResponse::*;
         match &msg.message {
             Message::NodeEvent {
                 event: NodeEvent::SectionPayoutValidated(validation),
                 ..
             } => Some(RewardDuty::ReceivePayoutValidation(validation.clone())),
-            Message::NodeQueryResponse {
-                response: NodeQueryResponse::Rewards(GetWalletId(Ok((wallet_id, new_node_id)))),
-                ..
-            } => Some(RewardDuty::ActivateNodeRewards {
-                id: *wallet_id,
-                node_id: *new_node_id,
-            }),
             _ => None,
         }
     }
@@ -372,11 +370,11 @@ impl NetworkMsgAnalysis {
             return None;
         }
 
-        use NodeRewardQuery::*;
+        use NodeRewardQueryResponse::*;
         match &msg.message {
             Message::NodeQuery {
                 query:
-                    NodeQuery::Rewards(GetWalletId {
+                    NodeQuery::Rewards(NodeRewardQuery::GetWalletId {
                         old_node_id,
                         new_node_id,
                     }),
@@ -386,6 +384,13 @@ impl NetworkMsgAnalysis {
                 new_node_id: *new_node_id,
                 msg_id: *id,
                 origin: msg.origin.address(),
+            }),
+            Message::NodeQueryResponse {
+                response: NodeQueryResponse::Rewards(GetWalletId(Ok((wallet_id, new_node_id)))),
+                ..
+            } => Some(RewardDuty::ActivateNodeRewards {
+                id: *wallet_id,
+                node_id: *new_node_id,
             }),
             _ => None,
         }

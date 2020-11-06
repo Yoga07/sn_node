@@ -76,7 +76,7 @@ impl Into<NodeOperation> for Vec<NodeOperation> {
 
 impl Into<NodeOperation> for Vec<Option<NodeOperation>> {
     fn into(self) -> NodeOperation {
-        NodeOperation::from_many(self.into_iter().filter_map(|c| c).collect())
+        NodeOperation::from_many(self.into_iter().flatten().collect())
     }
 }
 

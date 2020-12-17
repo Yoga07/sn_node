@@ -407,7 +407,7 @@ impl Rewards {
                 return self
                     .wrapping
                     .send_to_node(Message::NodeQueryResponse {
-                        response: Rewards(GetWalletId(Err(ErrorMessage::UnexpectedNodeError(
+                        response: Rewards(GetNodeWalletId(Err(ErrorMessage::UnexpectedNodeError(
                             "Node is not being relocated.".to_string(),
                         )))),
                         id: MessageId::in_response_to(&msg_id),

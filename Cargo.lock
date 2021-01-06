@@ -2596,6 +2596,7 @@ checksum = "c111b5bd5695e56cffe5129854aa230b39c93a305372fdbb2668ca2394eea9f8"
 [[package]]
 name = "sn_client"
 version = "0.44.13"
+source = "git+https://github.com/oetyng/sn_client?branch=rewards-flow#bd69db5ec483dc350d2f0f7171294f329f05e8ac"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -2635,6 +2636,7 @@ dependencies = [
 [[package]]
 name = "sn_data_types"
 version = "0.13.0"
+source = "git+https://github.com/oetyng/sn_data_types?branch=rewards-flow#236d1cb972f080b1a523c375a01fc11907e72096"
 dependencies = [
  "bincode",
  "crdts",
@@ -2668,6 +2670,7 @@ dependencies = [
 [[package]]
 name = "sn_messaging"
 version = "1.2.0"
+source = "git+https://github.com/oetyng/sn_messaging?branch=rewards-flow#56ce75953588fc020e5c1b2b461f2b99c74e1cc0"
 dependencies = [
  "bincode",
  "crdts",
@@ -2766,6 +2769,7 @@ dependencies = [
 [[package]]
 name = "sn_transfers"
 version = "0.2.9"
+source = "git+https://github.com/oetyng/sn_transfers?branch=rewards-flow#17dbf71dba5ca706a1f5178773dc6ceee19abace"
 dependencies = [
  "bincode",
  "crdts",

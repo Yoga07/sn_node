@@ -13,7 +13,7 @@ use crate::Result;
 use serde::export::Formatter;
 use sn_data_types::{
     Blob, BlobAddress, CreditAgreementProof, PublicKey, ReplicaEvent, SignedTransfer,
-    TransferAgreementProof, TransferValidated, WalletInfo,
+    SignedTransferShare, TransferAgreementProof, TransferValidated, WalletInfo,
 };
 use sn_messaging::{Address, MessageId, MsgEnvelope, MsgSender};
 
@@ -683,7 +683,7 @@ pub enum TransferCmd {
     /// crediting section, it is applied there.
     PropagateTransfer(CreditAgreementProof),
     /// The validation of a section transfer.
-    ValidateSectionPayout(SignedTransfer),
+    ValidateSectionPayout(SignedTransferShare),
     /// The registration of a section transfer.
     RegisterSectionPayout(TransferAgreementProof),
 }

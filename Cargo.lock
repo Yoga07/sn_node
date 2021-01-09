@@ -2769,7 +2769,7 @@ dependencies = [
 [[package]]
 name = "sn_transfers"
 version = "0.2.9"
-source = "git+https://github.com/oetyng/sn_transfers?branch=rewards-flow#412ed5c0b344eb567bea6a63c87364669c308b29"
+source = "git+https://github.com/oetyng/sn_transfers?branch=rewards-flow#175a16bcbe6cf35a0f31be85fc0fe1ea0079d9d4"
 dependencies = [
  "bincode",
  "crdts",

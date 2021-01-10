@@ -30,46 +30,36 @@ pub enum Error {
     /// Creating temp directory failed.
     #[error("Could not create temp store: {0}")]
     TempDirCreationFailed(String),
-
     /// Chunk Store Id could not be found
     #[error("Could not fetch StoreId")]
     NoStoreId,
-
     /// Threshold crypto combine signatures error
     #[error("Could not combine signatures")]
     CouldNotCombineSignatures,
     /// Chunk already exists for this node
     #[error("Data already exists at this node")]
     DataExists,
-
     /// I/O error.
     #[error("I/O error: {0}")]
     Io(#[from] io::Error),
-
     /// JSON serialisation error.
     #[error("JSON serialisation error:: {0}")]
     JsonSerialisation(#[from] serde_json::Error),
-
     /// Bincode error.
     #[error("Bincode error:: {0}")]
     Bincode(#[from] bincode::Error),
-
     /// Network message error.
     #[error("Network message error:: {0}")]
     Message(#[from] sn_messaging::Error),
-
     /// PickleDb error.
     #[error("PickleDb error:: {0}")]
     PickleDb(#[from] pickledb::error::Error),
-
     /// NetworkData error.
     #[error("Network data error:: {0}")]
     NetworkData(#[from] sn_data_types::Error),
-
     /// sn_transfers error.
     #[error("Transfer data error:: {0}")]
     Transfer(#[from] sn_transfers::Error),
-
     /// Routing error.
     #[error("Routing error:: {0}")]
     Routing(#[from] sn_routing::Error),
@@ -82,15 +72,12 @@ pub enum Error {
     /// Message is invalid.
     #[error("Message is invalid")]
     InvalidMessage,
-
     /// Data owner provided is invalid.
     #[error("Provided PublicKey is not a valid owner. Provided PublicKey: {0}")]
     InvalidOwners(sn_data_types::PublicKey),
-
     /// Data operation is invalid, eg private operation on public data
     #[error("Invalid operation")]
     InvalidOperation,
-
     /// Logic error.
     #[error("Logic error: {0}")]
     Logic(String),

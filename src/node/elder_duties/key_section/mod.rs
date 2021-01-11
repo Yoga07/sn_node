@@ -27,6 +27,8 @@ use sn_data_types::PublicKey;
 use sn_routing::Prefix;
 use std::path::PathBuf;
 use std::sync::Arc;
+use sn_transfers::{SignerTrait, Error as TransfersError};
+use async_trait::async_trait;
 
 /// A Key Section interfaces with clients,
 /// who are essentially a public key,
@@ -41,6 +43,33 @@ pub struct KeySection {
     transfers: Transfers,
     msg_analysis: ClientMsgAnalysis,
     network: Network,
+    signer: Signer,
+}
+
+pub struct Signer {
+    routing: Network,
+}
+
+impl Signer {
+    pub fn new(routing: Network) -> Self {
+        Signer {
+            routing,
+        }
+    }
+}
+
+#[async_trait]
+impl SignerTrait for Box<Signer> {
+    async fn sign_with_secret_key_share(&self, data: &[u8]) -> core::result::Result<bls::SignatureShare, TransfersError> {
+        self.routing.sign_with_secret_key_share(data).await.map_err(|e| TransfersError::InvalidSignature)
+    }
+}
+
+#[async_trait]
+impl SignerTrait for Signer {
+    async fn sign_with_secret_key_share(&self, data: &[u8]) -> core::result::Result<bls::SignatureShare, TransfersError> {
+        self.routing.sign_with_secret_key_share(data).await.map_err(|e| TransfersError::InvalidSignature)
+    }
 }
 
 impl KeySection {
@@ -49,12 +78,14 @@ impl KeySection {
         let replicas = Self::transfer_replicas(info.root_dir.clone(), network.clone()).await?;
         let transfers = Transfers::new(info.keys.clone(), replicas, rate_limit);
         let msg_analysis = ClientMsgAnalysis::new(network.clone());
+        let signer = Signer::new(network.clone());
 
         Ok(Self {
             gateway,
             transfers,
             msg_analysis,
             network,
+            signer,
         })
     }
 
@@ -90,12 +121,12 @@ impl KeySection {
     pub async fn elders_changed(&mut self, _new_section_key: PublicKey) -> Result<NodeOperation> {
         // TODO: Query sn_routing for info for [new_section_key]
         // specifically (regardless of how far back that was) - i.e. not the current info!
-        let secret_key_share = self.network.secret_key_share().await?;
-        let id = secret_key_share.public_key_share();
-        let key_index = self.network.our_index().await?;
         let peer_replicas = self.network.public_key_set().await?;
+        let key_index = self.network.our_index().await?;
+        let id = peer_replicas.public_key_share(key_index);
+        let signer = Signer::new(self.network.clone());
         let signing =
-            sn_transfers::ReplicaSigning::new(secret_key_share, key_index, peer_replicas.clone());
+            sn_transfers::ReplicaSigning::new(Box::new(Box::new(signer)), id,key_index, peer_replicas.clone());
         let info = ReplicaInfo {
             id,
             key_index,
@@ -125,12 +156,12 @@ impl KeySection {
     }
 
     async fn transfer_replicas(root_dir: PathBuf, network: Network) -> Result<Replicas> {
-        let secret_key_share = network.secret_key_share().await?;
         let key_index = network.our_index().await?;
         let peer_replicas = network.public_key_set().await?;
-        let id = secret_key_share.public_key_share();
+        let id = peer_replicas.public_key_share(key_index);
+        let signer = Signer::new(network.clone());
         let signing =
-            sn_transfers::ReplicaSigning::new(secret_key_share, key_index, peer_replicas.clone());
+            sn_transfers::ReplicaSigning::new(Box::new(signer), id, key_index, peer_replicas.clone());
         let info = ReplicaInfo {
             id,
             key_index,

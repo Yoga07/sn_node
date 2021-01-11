@@ -62,10 +62,10 @@ impl NodeSigningKeys {
     pub async fn sign_as_elder<T: Serialize>(&self, data: &T) -> Option<Signature> {
         let data = utils::serialise(data).ok()?;
         let index = self.routing.our_index().await.ok()?;
-        let bls_secret_key = self.routing.secret_key_share().await.ok()?;
+        let share = self.routing.sign_with_secret_key_share(&data).await.ok()?;
         Some(Signature::BlsShare(SignatureShare {
             index,
-            share: bls_secret_key.sign(data),
+            share,
         }))
     }
 }

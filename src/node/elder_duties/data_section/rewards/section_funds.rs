@@ -47,7 +47,7 @@ struct State {
     queued_payouts: VecDeque<Payout>,
     payout_in_flight: Option<Payout>,
     finished: BTreeSet<XorName>, // this set grows within acceptable bounds, since transitions do not happen that often, and at every section split, the set is cleared..
-    pending_actor: Option<(PublicKey, Keypair)>,
+    pending_actor: Option<(PublicKey, PublicKey)>,
     /// While awaiting payout completion
     next_actor: Option<TransferActor<Validator>>, // we could do a queue here, and when starting transition skip all but the last one, but that is also prone to edge case problems..
 }
@@ -89,7 +89,7 @@ impl SectionFunds {
     pub async fn init_transition(
         &mut self,
         new_wallet: PublicKey,
-        new_keypair_share: Keypair,
+        new_keypair_share: PublicKey,
     ) -> Result<NodeMessagingDuty> {
         info!("Initiating transition to new section wallet...");
         if self.has_initiated_transition() {

@@ -141,11 +141,11 @@ impl Network {
             .map_err(Error::Routing)
     }
 
-    pub async fn secret_key_share(&self) -> Result<bls::SecretKeyShare> {
+    pub async fn sign_with_secret_key_share(&self,data: &[u8]) -> Result<bls::SignatureShare> {
         self.routing
             .lock()
             .await
-            .secret_key_share()
+            .sign_with_secret_key_share(data)
             .await
             .map_err(Error::Routing)
     }

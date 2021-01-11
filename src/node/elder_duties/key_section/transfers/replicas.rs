@@ -181,7 +181,7 @@ impl Replicas {
             .signing
             .lock()
             .await
-            .sign_transfer(&signed_transfer)?
+            .sign_transfer(&signed_transfer).await?
         {
             // release lock and update state
             let event = TransferValidated {
@@ -280,7 +280,7 @@ impl Replicas {
                 .signing
                 .lock()
                 .await
-                .sign_credit_proof(credit_proof)?
+                .sign_credit_proof(credit_proof).await?
             {
                 let event = TransferPropagated {
                     credit_proof: credit_proof.clone(),
@@ -346,7 +346,7 @@ impl Replicas {
     async fn create_genesis(&self) -> Result<CreditAgreementProof> {
         // This means we are the first node in the network.
         let balance = u32::MAX as u64 * 1_000_000_000;
-        let signed_credit = self.info.signing.lock().await.try_genesis(balance)?;
+        let signed_credit = self.info.signing.lock().await.try_genesis(balance).await?;
         //.signed_credit;
         // let replica_credit_sig = self
         //     .info
@@ -406,7 +406,7 @@ impl Replicas {
             .signing
             .lock()
             .await
-            .sign_credit_proof(credit_proof)?
+            .sign_credit_proof(credit_proof).await?
         {
             // Q: are we locked on `info.signing` here? (we don't want to be)
             store.try_insert(ReplicaEvent::TransferPropagated(TransferPropagated {
@@ -544,7 +544,7 @@ impl Replicas {
             .signing
             .lock()
             .await
-            .sign_transfer(&signed_transfer)?
+            .sign_transfer(&signed_transfer).await?
         {
             store.try_insert(ReplicaEvent::TransferValidated(TransferValidated {
                 signed_credit: signed_transfer.credit,
@@ -586,7 +586,7 @@ impl Replicas {
                     .signing
                     .lock()
                     .await
-                    .sign_transfer(&agreed_transfer)?
+                    .sign_transfer(&agreed_transfer).await?
                 {
                     let event = TransferValidated {
                         signed_credit: agreed_transfer.credit,

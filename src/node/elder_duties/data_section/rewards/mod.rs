@@ -116,7 +116,7 @@ impl Rewards {
     pub async fn init_transition(
         &mut self,
         new_section_key: PublicKey,
-        new_keypair_share: Keypair,
+        new_keypair_share: PublicKey,
     ) -> Result<NodeOperation> {
         self.section_funds
             .init_transition(new_section_key, new_keypair_share)

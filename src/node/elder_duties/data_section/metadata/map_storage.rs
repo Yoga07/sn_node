@@ -21,6 +21,8 @@ use sn_data_types::{
 };
 use sn_messaging::{CmdError, MapRead, MapWrite, Message, MessageId, MsgSender, QueryResponse};
 
+use crate::node::elder_duties::MapDataExchange;
+use std::collections::BTreeMap;
 use std::fmt::{self, Display, Formatter};
 
 /// Operations over the data type Map.
@@ -88,6 +90,16 @@ impl MapStorage {
             }
             Edit { address, changes } => self.edit_entries(address, changes, msg_id, origin).await,
         }
+    }
+
+    pub fn fetch_data(&self) -> Result<MapDataExchange> {
+        let store = &self.chunks;
+        let all_keys = store.keys();
+        let mut map: BTreeMap<MapAddress, Map> = BTreeMap::new();
+        for key in all_keys {
+            let _ = map.insert(key, store.get(&key)?);
+        }
+        Ok(MapDataExchange(map))
     }
 
     /// Get `Map` from the chunk store and check permissions.

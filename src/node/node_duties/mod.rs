@@ -19,9 +19,8 @@ use crate::{
         msg_wrapping::NodeMsgWrapping,
         node_duties::messaging::Messaging,
         node_ops::{ElderDuty, IntoNodeOp, NodeDuty, NodeOperation, RewardCmd, RewardDuty},
-        NodeInfo,
     },
-    AdultState, ElderState, Error, Network, NodeState, Result,
+    AdultState, ElderState, Error, Network, NodeInfo, NodeState, Result,
 };
 use log::{debug, info, trace};
 use msg_analysis::NetworkMsgAnalysis;
@@ -31,8 +30,8 @@ use sn_data_types::{
     TransferPropagated, WalletInfo,
 };
 use sn_messaging::{
-    Address, Message, MessageId, NodeCmd, NodeDuties as MsgNodeDuties, NodeQuery, NodeSystemCmd,
-    NodeTransferQuery,
+    Address, Message, MessageId, NodeCmd, NodeDataQuery, NodeDuties as MsgNodeDuties, NodeQuery,
+    NodeSystemCmd, NodeTransferQuery,
 };
 use std::{
     collections::{BTreeMap, VecDeque},
@@ -385,7 +384,8 @@ impl NodeDuties {
             self.stage = Stage::AssumingElderDuties(VecDeque::new());
 
             use NodeTransferQuery::CatchUpWithSectionWallet;
-            return wrapping
+            // Catchup with Section Wallet
+            let first: NodeOperation = wrapping
                 .send_to_section(
                     Message::NodeQuery {
                         query: NodeQuery::Transfers(CatchUpWithSectionWallet(wallet_id)),
@@ -393,8 +393,28 @@ impl NodeDuties {
                     },
                     true,
                 )
-                .await
-                .convert();
+                .await?
+                .into();
+
+            let section_pk = self.network_api.section_public_key().await.ok_or_else(|| {
+                Error::Logic("We are not an Elder to request for DataExchange".to_string())
+            })?;
+
+            // Catchup with section data
+            let second: NodeOperation = wrapping
+                .send_to_section(
+                    Message::NodeQuery {
+                        query: NodeQuery::Data(NodeDataQuery::UpdateData {
+                            our_name: self.network_api.our_name().await,
+                            section_pk,
+                        }),
+                        id: MessageId::new(),
+                    },
+                    true,
+                )
+                .await?
+                .into();
+            return Ok(vec![first, second].into());
         }
 
         Ok(NodeOperation::NoOp)

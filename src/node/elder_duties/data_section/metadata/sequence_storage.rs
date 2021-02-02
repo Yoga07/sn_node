@@ -24,6 +24,8 @@ use sn_messaging::{
     CmdError, Message, MessageId, MsgSender, QueryResponse, SequenceRead, SequenceWrite,
 };
 
+use crate::node::elder_duties::SequenceDataExchange;
+use std::collections::BTreeMap;
 use std::fmt::{self, Display, Formatter};
 
 /// Operations over the data type Sequence.
@@ -84,6 +86,16 @@ impl SequenceStorage {
                     .await
             }
         }
+    }
+
+    pub fn fetch_data(&self) -> Result<SequenceDataExchange> {
+        let store = &self.chunks;
+        let all_keys = store.keys();
+        let mut map: BTreeMap<SequenceAddress, Sequence> = BTreeMap::new();
+        for key in all_keys {
+            let _ = map.insert(key, store.get(&key)?);
+        }
+        Ok(SequenceDataExchange(map))
     }
 
     async fn store(

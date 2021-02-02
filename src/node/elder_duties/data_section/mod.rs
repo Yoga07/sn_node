@@ -142,6 +142,16 @@ impl DataSection {
         self.rewards.catchup_with_replicas().await
     }
 
+    pub async fn prepare_to_give_data(
+        &mut self,
+        requester: Address,
+        correlation_id: MessageId,
+    ) -> Result<NodeOperation> {
+        self.metadata
+            .fetch_data_for(requester, correlation_id)
+            .await
+    }
+
     /// Transition the section funds account to the new key.
     pub async fn initiate_elder_change(
         &mut self,

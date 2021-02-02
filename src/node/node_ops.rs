@@ -280,6 +280,13 @@ pub enum ElderDuty {
         node_id: PublicKey,
     },
     SwitchNodeJoin(bool),
+    /// Process UpdateData request from another Elder
+    PrepareForUpdateDataResponse {
+        /// XorName of the requesting Elder
+        requester: Address,
+        /// Original request MessageId
+        correlation_id: MessageId,
+    },
 }
 
 impl Into<NodeOperation> for ElderDuty {

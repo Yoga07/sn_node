@@ -24,7 +24,9 @@ use blob_register::BlobRegister;
 use elder_stores::ElderStores;
 use map_storage::MapStorage;
 use sequence_storage::SequenceStorage;
-use sn_messaging::{ElderDuties, Message, MsgEnvelope};
+use sn_messaging::{
+    Address, ElderDuties, Message, MessageId, MsgEnvelope, NodeDataQueryResponse, NodeQueryResponse,
+};
 
 use std::fmt::{self, Display, Formatter};
 use xor_name::XorName;
@@ -64,6 +66,21 @@ impl Metadata {
             ProcessRead(msg) | ProcessWrite(msg) => self.process_msg(msg).await,
             NoOp => Ok(NodeOperation::NoOp),
         }
+    }
+
+    pub async fn fetch_data_for(
+        &self,
+        requester: Address,
+        correlation_id: MessageId,
+    ) -> Result<NodeOperation> {
+        let data = self.elder_stores.fetch_all_data_for()?;
+        let message = Message::NodeQueryResponse {
+            response: NodeQueryResponse::Data(NodeDataQueryResponse::UpdateData(data)),
+            id: MessageId::in_response_to(&correlation_id),
+            correlation_id,
+            query_origin: requester,
+        };
+        self.wrapping.send_to_node(message).await.convert()
     }
 
     async fn process_msg(&mut self, msg: MsgEnvelope) -> Result<NodeOperation> {

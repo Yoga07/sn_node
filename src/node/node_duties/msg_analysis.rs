@@ -99,6 +99,10 @@ impl NetworkMsgAnalysis {
             TransferDuty::NoOp => (),
             op => return Ok(op.into()),
         };
+        match self.try_data_replication(&msg).await? {
+            ElderDuty::NoOp => (),
+            op => return Ok(op.into()),
+        }
         match self.try_metadata(&msg).await? {
             // Accumulated msg from `Payment`!
             MetadataDuty::NoOp => (),
@@ -354,6 +358,37 @@ impl NetworkMsgAnalysis {
             return Ok(AdultNoOp);
         };
         Ok(duty)
+    }
+
+    async fn try_data_replication(&self, msg: &MsgEnvelope) -> Result<ElderDuty> {
+        match &msg.message {
+            Message::NodeQuery {
+                query:
+                    NodeQuery::Data(NodeDataQuery::UpdateData {
+                        our_name,
+                        section_pk,
+                    }),
+                ..
+            } => {
+                if self.is_elder().await
+                    && self
+                        .network
+                        .section_public_key()
+                        .await
+                        .ok_or(Error::InvalidOperation)?
+                        == *section_pk
+                {
+                    // remove unwrap
+                    return Ok(ElderDuty::PrepareForUpdateDataResponse {
+                        requester: Address::Node(*our_name),
+                        correlation_id: msg.id(),
+                    });
+                } else {
+                    Ok(ElderDuty::NoOp)
+                }
+            }
+            _ => Ok(ElderDuty::NoOp),
+        }
     }
 
     async fn try_chunk_replication(&self, msg: &MsgEnvelope) -> Result<AdultDuty> {

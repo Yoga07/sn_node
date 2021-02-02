@@ -9,6 +9,8 @@
 use super::{
     blob_register::BlobRegister, map_storage::MapStorage, sequence_storage::SequenceStorage,
 };
+use crate::Result;
+use std::collections::BTreeMap;
 
 /// The various data type stores,
 /// that are only managed at Elders.
@@ -53,5 +55,24 @@ impl ElderStores {
 
     pub fn sequence_storage_mut(&mut self) -> &mut SequenceStorage {
         &mut self.sequence_storage
+    }
+
+    pub fn fetch_all_data_for(&self) -> Result<BTreeMap<String, Vec<u8>>> {
+        let blob_register = self.blob_register.fetch_register()?;
+        let map_list = self.map_storage.fetch_data()?;
+        let sequence_list = self.sequence_storage.fetch_data()?;
+
+        let mut aggregated_map = BTreeMap::new();
+        let _ = aggregated_map.insert(
+            "BlobRegister".to_string(),
+            bincode::serialize(&blob_register)?,
+        );
+        let _ = aggregated_map.insert("MapData".to_string(), bincode::serialize(&map_list)?);
+        let _ = aggregated_map.insert(
+            "SequenceData".to_string(),
+            bincode::serialize(&sequence_list)?,
+        );
+
+        Ok(aggregated_map)
     }
 }

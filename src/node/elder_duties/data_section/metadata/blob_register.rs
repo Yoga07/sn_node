@@ -21,6 +21,7 @@ use sn_messaging::{
     NodeCmd, NodeDataCmd, Query, QueryResponse,
 };
 
+use crate::node::elder_duties::BlobDataExchange;
 use std::{
     collections::{BTreeMap, BTreeSet},
     fmt::{self, Display, Formatter},
@@ -349,7 +350,7 @@ impl BlobRegister {
         for message in messages {
             match self.wrapping.send_to_node(message.clone()).await {
                 Ok(op) => node_ops.push(op.into()),
-                Err(e) => warn!("Error: {}. Failed to send msg to node: {:?}", e, message),
+                Err(e) => warn!("Error: {:?}. Failed to send msg to node: {:?}", e, message),
             }
         }
         node_ops
@@ -366,6 +367,47 @@ impl BlobRegister {
         match read {
             Get(address) => self.get(*address, msg_id, origin, proxies).await,
         }
+    }
+
+    pub fn fetch_register(&self) -> Result<BlobDataExchange> {
+        // Prepare full_adult details
+        let adult_details = self.dbs.full_adults.borrow();
+        let all_full_adults_keys = adult_details.get_all();
+        let mut full_adults = BTreeMap::new();
+        for key in all_full_adults_keys {
+            let val: String = adult_details
+                .get(&key)
+                .ok_or_else(|| Error::Logic("Error fetching full Adults".to_string()))?;
+            let _ = full_adults.insert(key, val);
+        }
+
+        // Prepare Holder Details
+        let holder_details = self.dbs.holders.borrow();
+        let all_holder_keys = holder_details.get_all();
+        let mut holders = BTreeMap::new();
+        for key in all_holder_keys {
+            let val: String = holder_details
+                .get(&key)
+                .ok_or_else(|| Error::Logic("Error fetching Holder".to_string()))?;
+            let _ = holders.insert(key, val);
+        }
+
+        // Prepare Metadata Details
+        let metadata_details = self.dbs.metadata.borrow();
+        let all_metadata_keys = metadata_details.get_all();
+        let mut metadata = BTreeMap::new();
+        for key in all_metadata_keys {
+            let val: String = metadata_details
+                .get(&key)
+                .ok_or_else(|| Error::Logic("Error fetching Metadata".to_string()))?;
+            let _ = metadata.insert(key, val);
+        }
+
+        Ok(BlobDataExchange {
+            full_adults,
+            holders,
+            metadata,
+        })
     }
 
     async fn get(
@@ -531,25 +573,9 @@ impl BlobRegister {
     // Returns `XorName`s of the target holders for an Blob chunk.
     // Used to fetch the list of holders for a new chunk.
     async fn get_holders_for_chunk(&self, target: &XorName) -> Vec<XorName> {
-        //let closest_adults =
         self.elder_state
             .adults_sorted_by_distance_to(&target, CHUNK_COPY_COUNT)
             .await
-
-        // TODO: Investigate elder blob storage
-        // if closest_adults.len() < CHUNK_COPY_COUNT {
-        //     let take = CHUNK_COPY_COUNT - closest_adults.len();
-        //     let mut closest_elders = self
-        //         .routing
-        //         .our_elder_names_sorted_by_distance_to(&target, take)
-        //         .await;
-        //     closest_adults.append(&mut closest_elders);
-        //     closest_adults
-        // } else {
-        //     closest_adults
-        // }
-
-        //closest_adults
     }
 
     // Returns `XorName`s of the new target holders for an Blob chunk.

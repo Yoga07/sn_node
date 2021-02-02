@@ -16,8 +16,11 @@ use crate::{
     ElderState, Result,
 };
 use log::trace;
-use sn_data_types::{PublicKey, TransferPropagated, WalletInfo};
+use sn_data_types::{
+    Map, MapAddress, PublicKey, Sequence, SequenceAddress, TransferPropagated, WalletInfo,
+};
 use sn_routing::Prefix;
+use std::collections::BTreeMap;
 use std::fmt::{self, Display, Formatter};
 use xor_name::XorName;
 
@@ -89,6 +92,14 @@ impl ElderDuties {
             SwitchNodeJoin(joins_allowed) => {
                 self.key_section.set_node_join_flag(joins_allowed).await
             }
+            PrepareForUpdateDataResponse {
+                requester,
+                correlation_id,
+            } => {
+                self.data_section
+                    .prepare_to_give_data(requester, correlation_id)
+                    .await
+            }
             NoOp => Ok(NodeOperation::NoOp),
         }
     }
@@ -153,3 +164,20 @@ impl Display for ElderDuties {
         write!(formatter, "ElderDuties")
     }
 }
+
+use serde::{Deserialize, Serialize};
+#[derive(Serialize, Deserialize)]
+pub(crate) struct BlobDataExchange {
+    /// Full Adults register
+    pub full_adults: BTreeMap<String, String>,
+    /// Blob holders register
+    pub holders: BTreeMap<String, String>,
+    /// Metadata register
+    pub metadata: BTreeMap<String, String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub(crate) struct MapDataExchange(BTreeMap<MapAddress, Map>);
+
+#[derive(Serialize, Deserialize)]
+pub(crate) struct SequenceDataExchange(BTreeMap<SequenceAddress, Sequence>);

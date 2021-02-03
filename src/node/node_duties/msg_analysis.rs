@@ -387,6 +387,16 @@ impl NetworkMsgAnalysis {
                     Ok(ElderDuty::NoOp)
                 }
             }
+            Message::NodeQueryResponse {
+                response: NodeQueryResponse::Data(NodeDataQueryResponse::UpdateData(data)),
+                ..
+            } => {
+                if self.is_elder().await {
+                    Ok(ElderDuty::UpdateDataStores { data: data.clone() })
+                } else {
+                    Ok(ElderDuty::NoOp)
+                }
+            }
             _ => Ok(ElderDuty::NoOp),
         }
     }

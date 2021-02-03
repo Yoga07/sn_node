@@ -410,6 +410,31 @@ impl BlobRegister {
         })
     }
 
+    pub fn catchup_with_section(&self, blob_register_exchange: BlobDataExchange) -> Result<()> {
+        let mut orig_meta = self.dbs.metadata.borrow_mut();
+        let mut orig_holders = self.dbs.holders.borrow_mut();
+        let mut orig_full_adults = self.dbs.full_adults.borrow_mut();
+        let BlobDataExchange {
+            metadata,
+            holders,
+            full_adults,
+        } = blob_register_exchange;
+
+        for (key, value) in metadata {
+            orig_meta.set(&key, &value)?;
+        }
+
+        for (key, value) in holders {
+            orig_holders.set(&key, &value)?;
+        }
+
+        for (key, value) in full_adults {
+            orig_full_adults.set(&key, &value)?;
+        }
+
+        Ok(())
+    }
+
     async fn get(
         &self,
         address: BlobAddress,

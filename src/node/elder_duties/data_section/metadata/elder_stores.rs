@@ -9,7 +9,9 @@
 use super::{
     blob_register::BlobRegister, map_storage::MapStorage, sequence_storage::SequenceStorage,
 };
+use crate::node::elder_duties::{BlobDataExchange, MapDataExchange, SequenceDataExchange};
 use crate::Result;
+use log::info;
 use std::collections::BTreeMap;
 
 /// The various data type stores,
@@ -74,5 +76,24 @@ impl ElderStores {
         );
 
         Ok(aggregated_map)
+    }
+
+    pub async fn catchup_with_section(
+        &mut self,
+        blob_data_exchange: BlobDataExchange,
+        map_data_exchange: MapDataExchange,
+        seq_data_exchange: SequenceDataExchange,
+    ) -> Result<()> {
+        info!("Updating ChunkStores and BlobRegister");
+        self.blob_register
+            .catchup_with_section(blob_data_exchange)?;
+        self.map_storage
+            .catchup_with_section(map_data_exchange)
+            .await?;
+        self.sequence_storage
+            .catchup_with_section(seq_data_exchange)
+            .await?;
+        info!("Successfully updated ChunkStores");
+        Ok(())
     }
 }

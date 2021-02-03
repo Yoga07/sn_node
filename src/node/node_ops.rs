@@ -19,7 +19,7 @@ use sn_messaging::{Address, MessageId, MsgEnvelope, MsgSender};
 use std::fmt::Formatter;
 
 use sn_routing::{Event as RoutingEvent, Prefix};
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Debug;
 use xor_name::XorName;
 
@@ -286,6 +286,9 @@ pub enum ElderDuty {
         requester: Address,
         /// Original request MessageId
         correlation_id: MessageId,
+    },
+    UpdateDataStores {
+        data: BTreeMap<String, Vec<u8>>,
     },
 }
 

@@ -25,6 +25,7 @@ use sn_messaging::{
 };
 
 use crate::node::elder_duties::SequenceDataExchange;
+use std::borrow::BorrowMut;
 use std::collections::BTreeMap;
 use std::fmt::{self, Display, Formatter};
 
@@ -96,6 +97,20 @@ impl SequenceStorage {
             let _ = map.insert(key, store.get(&key)?);
         }
         Ok(SequenceDataExchange(map))
+    }
+
+    pub async fn catchup_with_section(
+        &mut self,
+        blob_register_exchange: SequenceDataExchange,
+    ) -> Result<()> {
+        let chunkstore = self.chunks.borrow_mut();
+        let SequenceDataExchange(data) = blob_register_exchange;
+
+        for (_key, value) in data {
+            chunkstore.put(&value).await?;
+        }
+
+        Ok(())
     }
 
     async fn store(
@@ -412,25 +427,6 @@ impl SequenceStorage {
             .await;
         self.ok_or_error(result, msg_id, origin).await
     }
-
-    // fn set_owner(
-    //     &mut self,
-    //     write_op: SequenceDataWriteOp<SequenceOwner>,
-    //     msg_id: MessageId,
-    //     origin: &MsgSender,
-    // ) -> Result<NodeMessagingDuty> {
-    //     let address = write_op.address;
-    //     let result = self.edit_chunk(
-    //         address,
-    //         SequenceAction::Admin,
-    //         origin,
-    //         move |mut sequence| {
-    //             sequence.apply_crdt_owner_op(write_op.crdt_op);
-    //             Ok(sequence)
-    //         },
-    //     );
-    //     self.ok_or_error(result, msg_id, &origin)
-    // }
 
     async fn edit(
         &mut self,

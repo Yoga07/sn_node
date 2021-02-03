@@ -24,6 +24,7 @@ use sn_data_types::{OwnerType, Result as DtResult, Signing, WalletInfo};
 use sn_messaging::{Address, MessageId};
 use sn_routing::Prefix;
 use sn_transfers::TransferActor;
+use std::collections::BTreeMap;
 use xor_name::XorName;
 
 /// A DataSection is responsible for
@@ -150,6 +151,16 @@ impl DataSection {
         self.metadata
             .fetch_data_for(requester, correlation_id)
             .await
+    }
+
+    pub async fn update_data_store(
+        &mut self,
+        data: BTreeMap<String, Vec<u8>>,
+    ) -> Result<NodeOperation> {
+        self.metadata
+            .catchup_with_section(data)
+            .await
+            .map(|_| NodeOperation::NoOp)
     }
 
     /// Transition the section funds account to the new key.

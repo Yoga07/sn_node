@@ -22,12 +22,15 @@ use crate::{
 };
 use blob_register::BlobRegister;
 use elder_stores::ElderStores;
+use log::info;
 use map_storage::MapStorage;
 use sequence_storage::SequenceStorage;
 use sn_messaging::{
     Address, ElderDuties, Message, MessageId, MsgEnvelope, NodeDataQueryResponse, NodeQueryResponse,
 };
 
+use crate::node::elder_duties::{BlobDataExchange, MapDataExchange, SequenceDataExchange};
+use std::collections::BTreeMap;
 use std::fmt::{self, Display, Formatter};
 use xor_name::XorName;
 
@@ -81,6 +84,27 @@ impl Metadata {
             query_origin: requester,
         };
         self.wrapping.send_to_node(message).await.convert()
+    }
+
+    pub async fn catchup_with_section(&mut self, data: BTreeMap<String, Vec<u8>>) -> Result<()> {
+        info!("Catching up with Data from section");
+        let serialised_blob_register = data
+            .get("BlobRegister")
+            .ok_or_else(|| Error::Logic("BlobRegister not given on Data sharing".to_string()))?;
+        let serialised_map_data = data
+            .get("MapData")
+            .ok_or_else(|| Error::Logic("MapData not given on Data sharing".to_string()))?;
+        let serialised_sequence_data = data
+            .get("SequenceData")
+            .ok_or_else(|| Error::Logic("SequenceData not given on Data sharing".to_string()))?;
+
+        let blob_data_exchange: BlobDataExchange = bincode::deserialize(&serialised_blob_register)?;
+        let map_data_exchange: MapDataExchange = bincode::deserialize(&serialised_map_data)?;
+        let seq_data_exchange: SequenceDataExchange =
+            bincode::deserialize(&serialised_sequence_data)?;
+        self.elder_stores
+            .catchup_with_section(blob_data_exchange, map_data_exchange, seq_data_exchange)
+            .await
     }
 
     async fn process_msg(&mut self, msg: MsgEnvelope) -> Result<NodeOperation> {

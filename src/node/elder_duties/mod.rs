@@ -100,6 +100,7 @@ impl ElderDuties {
                     .prepare_to_give_data(requester, correlation_id)
                     .await
             }
+            UpdateDataStores { data } => self.data_section.update_data_store(data).await,
             NoOp => Ok(NodeOperation::NoOp),
         }
     }

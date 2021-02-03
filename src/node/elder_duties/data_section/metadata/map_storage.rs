@@ -22,6 +22,7 @@ use sn_data_types::{
 use sn_messaging::{CmdError, MapRead, MapWrite, Message, MessageId, MsgSender, QueryResponse};
 
 use crate::node::elder_duties::MapDataExchange;
+use std::borrow::BorrowMut;
 use std::collections::BTreeMap;
 use std::fmt::{self, Display, Formatter};
 
@@ -100,6 +101,20 @@ impl MapStorage {
             let _ = map.insert(key, store.get(&key)?);
         }
         Ok(MapDataExchange(map))
+    }
+
+    pub async fn catchup_with_section(
+        &mut self,
+        blob_register_exchange: MapDataExchange,
+    ) -> Result<()> {
+        let chunkstore = self.chunks.borrow_mut();
+        let MapDataExchange(data) = blob_register_exchange;
+
+        for (_key, value) in data {
+            chunkstore.put(&value).await?;
+        }
+
+        Ok(())
     }
 
     /// Get `Map` from the chunk store and check permissions.

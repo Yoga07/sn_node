@@ -310,6 +310,7 @@ impl NodeDuties {
             || matches!(self.stage, Stage::AssumingElderDuties(_))
             || matches!(self.stage, Stage::AwaitingGenesisThreshold(_))
         {
+            info!("We are alreay an Elder/becoming an Elder");
             return Ok(NodeOperation::NoOp);
         } else if !self.node_info.genesis && matches!(self.stage, Stage::Infant) {
             return Err(Error::InvalidOperation);

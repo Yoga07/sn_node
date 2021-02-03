@@ -1,4 +1,4 @@
-// Copyright 2020 MaidSafe.net limited.
+// Copyright 2021 MaidSafe.net limited.
 //
 // This SAFE Network Software is licensed to you under The General Public License (GPL), version 3.
 // Unless required by applicable law or agreed to in writing, the SAFE Network Software distributed
@@ -31,7 +31,7 @@ use dirs_next::home_dir;
 use log::{debug, info};
 use sn_launch_tool::run_with;
 use std::{
-    fs::{create_dir_all, remove_dir_all},
+    fs::create_dir_all,
     path::PathBuf,
     process::{Command, Stdio},
 };
@@ -49,10 +49,6 @@ const RUST_LOG: &str = "RUST_LOG";
 
 #[tokio::main]
 async fn main() -> Result<(), String> {
-    let path = std::path::Path::new("nodes");
-    remove_dir_all(&path).unwrap_or(()); // Delete nodes directory if it exists;
-    create_dir_all(&path).expect("Cannot create nodes directory");
-
     let args: Vec<&str> = vec!["build", "--features=simulated-payouts", "--release"];
     println!("Building current sn_node");
     let _child = Command::new("cargo")

@@ -9,33 +9,35 @@
 mod metadata;
 mod rewards;
 
-use self::{
-    metadata::Metadata,
-    rewards::{RewardCalc, Rewards, Validator},
-};
+use self::metadata::Metadata; //{
+                              //metadata::Metadata,
+                              //rewards::{RewardCalc, Rewards, Validator},
+                              //};
 use crate::{
     capacity::ChunkHolderDbs,
     node::node_ops::{DataSectionDuty, NetworkDuties, RewardCmd, RewardDuty},
     node::NodeInfo,
-    ElderState, Result,
+    ElderState,
+    Result,
 };
 use log::info;
 use sn_data_types::{OwnerType, Result as DtResult, Signing, WalletInfo};
 use sn_messaging::{MessageId, SrcLocation};
 use sn_routing::Prefix;
-use sn_transfers::TransferActor;
+//use sn_transfers::TransferActor;
 use xor_name::XorName;
 
 /// A DataSection is responsible for
 /// the storage and retrieval of data,
 /// and the rewarding of nodes in the section
 /// for participating in these duties.
+#[allow(unused)]
 pub struct DataSection {
     /// The logic for managing data.
     metadata: Metadata,
-    /// Rewards for performing storage
-    /// services to the network.
-    rewards: Rewards,
+    // /// Rewards for performing storage
+    // /// services to the network.
+    // rewards: Rewards,
     /// The network state.
     elder_state: ElderState,
 }
@@ -45,6 +47,7 @@ pub struct ElderSigning {
     elder_state: ElderState,
 }
 
+#[allow(unused)]
 impl ElderSigning {
     pub fn new(elder_state: ElderState) -> Self {
         Self {
@@ -105,7 +108,7 @@ impl DataSection {
     pub async fn new(
         info: &NodeInfo,
         dbs: ChunkHolderDbs,
-        wallet_info: WalletInfo,
+        _wallet_info: WalletInfo,
         elder_state: ElderState,
     ) -> Result<Self> {
         // Metadata
@@ -119,7 +122,7 @@ impl DataSection {
 
         Ok(Self {
             metadata,
-            rewards,
+            //rewards,
             elder_state,
         })
     }
@@ -157,7 +160,8 @@ impl DataSection {
         // make sure demoted is handled properly first, so that
         // EldersChanged doesn't lead to calling this method..
 
-        self.rewards.init_transition(elder_state).await
+        //self.rewards.init_transition(elder_state).await
+        Ok(NodeOperation::NoOp)
     }
 
     /// At section split, all Elders get their reward payout.

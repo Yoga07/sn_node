@@ -293,7 +293,8 @@ impl NodeDuties {
         // let it be upper layer resp.
         // Also, "Error-to-Unit" is not a good conversion..
         //dump_state(AgeGroup::Adult, self.node_info.path(), &self.id).unwrap_or(());
-        Ok(NodeDuty::RegisterWallet(self.node_info.reward_key).into())
+        //Ok(NodeDuty::RegisterWallet(self.node_info.reward_key).into())
+        Ok(NodeOperation::NoOp)
     }
 
     async fn begin_transition_to_elder(&mut self) -> Result<NetworkDuties> {

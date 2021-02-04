@@ -64,6 +64,7 @@ pub enum NodeRewards {
     AwaitingRelocation(PublicKey),
 }
 
+#[allow(unused)]
 impl Rewards {
     pub fn new(actor: SectionActor, reward_calc: RewardCalc) -> Self {
         let section_funds = SectionFunds::new(actor);

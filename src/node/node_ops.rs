@@ -322,10 +322,10 @@ pub enum DataSectionDuty {
     /// from the actual data, that is in chunks.
     /// NB: Full separation between metadata and chunks is not yet implemented.
     RunAsMetadata(MetadataDuty),
-    /// Dealing out rewards for contributing to
-    /// the network by storing metadata / data, and
-    /// carrying out operations on those.
-    RunAsRewards(RewardDuty),
+    // /// Dealing out rewards for contributing to
+    // /// the network by storing metadata / data, and
+    // /// carrying out operations on those.
+    // RunAsRewards(RewardDuty),
     NoOp,
 }
 
@@ -444,6 +444,7 @@ pub enum ChunkReplicationCmd {
 /// payouts from the section account.
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug)]
+#[allow(unused)]
 pub enum RewardDuty {
     ///
     ProcessQuery {
@@ -466,6 +467,7 @@ pub enum RewardDuty {
 
 #[derive(Debug)]
 #[allow(clippy::large_enum_variant)]
+#[allow(unused)]
 pub enum RewardCmd {
     /// Initiates a new SectionActor with the
     /// state of existing Replicas in the group.
@@ -512,6 +514,7 @@ pub enum RewardCmd {
 /// payouts from the section account.
 #[derive(Debug)]
 #[allow(clippy::large_enum_variant)]
+#[allow(unused)]
 pub enum RewardQuery {
     /// When a node is relocated from us, the other
     /// section will query for the node wallet id.

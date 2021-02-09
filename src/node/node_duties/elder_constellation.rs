@@ -123,7 +123,8 @@ impl ElderConstellation {
 
         debug!("Key section completed elder change update.");
         debug!("Elder change update completed.");
-
+        debug!(">> Finishing split. Change prefix: {:?}", change.prefix);
+        debug!(">> Finishing split. old state prefix: {:?}", old_elder_state.prefix());
         // split section _after_ transition to new constellation
         if &change.prefix != old_elder_state.prefix() {
             info!("Split occurred");

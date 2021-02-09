@@ -67,7 +67,7 @@ impl ElderConstellation {
             return Ok(vec![]);
         }
 
-        info!("Elder change updates initiated");
+        info!(">>Elder change updates initiated");
 
         self.pending_changes.push(ConstellationChange {
             section_key: new_section_key,
@@ -84,6 +84,7 @@ impl ElderConstellation {
         // Otherwise there is no guarantee of not getting more recent info than expected!
         let new_elder_state = ElderState::new(self.network.clone()).await?;
         self.duties.initiate_elder_change(new_elder_state).await
+        
     }
 
     ///

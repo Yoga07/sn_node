@@ -29,6 +29,7 @@ use std::{
     path::{Path, PathBuf},
 };
 use xor_name::{Prefix, XorName};
+use log::debug;
 
 // we want a consistent view of the elder constellation
 

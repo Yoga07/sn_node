@@ -749,7 +749,7 @@ impl Transfers {
                     correlation_id: msg_id,
                     cmd_origin: origin,
                 }
-            },
+            }
             Err(e) => unimplemented!("Error must be handled at receive_propagated, {:?}", e),
         };
         Ok(NodeMessagingDuty::Send(OutgoingMsg {

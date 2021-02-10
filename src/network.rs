@@ -105,6 +105,10 @@ impl Network {
         self.routing.lock().await.our_connection_info()
     }
 
+    pub async fn section_chain(&self) -> SectionProofChain {
+        self.routing.lock().await.section_chain().await
+    }
+
     pub async fn our_prefix(&self) -> Prefix {
         self.routing.lock().await.our_prefix().await
     }

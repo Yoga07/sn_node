@@ -323,8 +323,7 @@ impl<T: ReplicaSigning> Replicas<T> {
                 wallet.apply(ReplicaEvent::TransferPropagated(event.clone()))?;
             }
             return Ok(event);
-        }
-        else {
+        } else {
             error!("Error from popagation:{:?}", propagation_result);
         }
         Err(Error::InvalidPropagatedTransfer(credit_proof.clone()))

@@ -324,6 +324,9 @@ impl<T: ReplicaSigning> Replicas<T> {
             }
             return Ok(event);
         }
+        else {
+            error!("Error from popagation:{:?}", propagation_result);
+        }
         Err(Error::InvalidPropagatedTransfer(credit_proof.clone()))
     }
 

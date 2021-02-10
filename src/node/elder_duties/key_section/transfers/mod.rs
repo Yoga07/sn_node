@@ -23,7 +23,7 @@ use crate::{
     },
     utils, Error, Result,
 };
-use log::{debug, info, trace, warn};
+use log::{debug, error, info, trace, warn};
 use replica_signing::ReplicaSigningImpl;
 #[cfg(feature = "simulated-payouts")]
 use sn_data_types::Transfer;
@@ -739,7 +739,18 @@ impl Transfers {
                     target_section_pk: None,
                 }
             }
-            Err(_e) => unimplemented!("receive_propagated"),
+            Err(Error::Transfer(error)) => {
+                error!("Error must be handled at receive_propagated, {:?}", error);
+
+                // Nonsense error just not to crash node for now. Should be converted properly to be handled at client.
+                Message::NodeCmdError {
+                    error: NodeCmdError::Transfers(TransferPropagation(ErrorMessage::NoSuchKey)),
+                    id: MessageId::new(),
+                    correlation_id: msg_id,
+                    cmd_origin: origin,
+                }
+            },
+            Err(e) => unimplemented!("Error must be handled at receive_propagated, {:?}", e),
         };
         Ok(NodeMessagingDuty::Send(OutgoingMsg {
             msg,

@@ -244,7 +244,7 @@ impl Transfers {
     async fn process_payment(&self, msg: &MsgEnvelope) -> Result<NodeMessagingDuty> {
         let (payment, num_bytes) = match &msg.message {
             Message::Cmd {
-                cmd: Cmd::Data { payment, cmd },
+                cmd: Cmd::Data { payment, cmd, .. },
                 ..
             } => (payment, utils::serialise(cmd)?.len() as u64),
             _ => return Ok(NodeMessagingDuty::NoOp),

@@ -89,6 +89,7 @@ impl ElderConstellation {
 
         // handle changes sequentially
         if self.pending_changes.len() > 1 {
+            info!("Returning NoOp as we have pending changes, not finishing elder change.");
             return Ok(NodeOperation::NoOp);
         }
 

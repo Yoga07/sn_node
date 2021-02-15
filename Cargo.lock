@@ -2365,6 +2365,32 @@ dependencies = [
 [[package]]
 name = "sn_messaging"
 version = "3.0.2"
+dependencies = [
+ "bincode",
+ "bytes 1.0.1",
+ "cookie-factory",
+ "crdts",
+ "ed25519",
+ "ed25519-dalek",
+ "hex_fmt",
+ "multibase",
+ "rand 0.7.3",
+ "rand_core 0.5.1",
+ "rmp-serde",
+ "serde",
+ "serde_bytes",
+ "sha3",
+ "signature",
+ "sn_data_types",
+ "thiserror",
+ "threshold_crypto",
+ "tiny-keccak 2.0.2",
+ "xor_name",
+]
+
+[[package]]
+name = "sn_messaging"
+version = "3.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5e53fcef94eec176c9831782f5e95f9e48e66814d2c7639304f605fca55565f"
 dependencies = [
@@ -2424,7 +2450,7 @@ dependencies = [
  "signature",
  "sn_data_types",
  "sn_launch_tool",
- "sn_messaging",
+ "sn_messaging 3.0.2",
  "sn_routing",
  "sn_transfers",
  "structopt",
@@ -2455,7 +2481,7 @@ dependencies = [
  "rand_chacha 0.2.2",
  "resource_proof",
  "serde",
- "sn_messaging",
+ "sn_messaging 3.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "thiserror",
  "threshold_crypto",
  "tiny-keccak 2.0.2",
@@ -2467,8 +2493,7 @@ dependencies = [
 [[package]]
 name = "sn_transfers"
 version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c94e8edc973121e93076707bcf2ce3ab88cecac801505813769086e5415f2807"
+source = "git+https://github.com/joshuef/sn_transfers?branch=MissingKeyHack#59e76069b3405fd2ae6495e78842a069a4203d53"
 dependencies = [
  "bincode",
  "crdts",

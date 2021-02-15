@@ -248,15 +248,41 @@ impl Transfers {
         };
         let (payment, data_cmd, num_bytes, dst_address) = match &msg {
             Message::Cmd {
-                cmd: Cmd::Data { payment, cmd },
+                cmd: Cmd::Data { payment, cmd, .. },
                 ..
-            } => (
-                payment,
-                cmd,
-                utils::serialise(cmd)?.len() as u64,
-                cmd.dst_address(),
-            ),
+            } => {
+                // Forward directly if the Cmd is a mutation as Mutations are free.
+                if cmd.is_mutation() {
+                    info!("Received Cmd is a mutation, forwarding data to DataSection as mutations are free.");
+                    return Ok(NodeMessagingDuty::Send(OutgoingMsg {
+                        msg: Message::NodeCmd {
+                            cmd: NodeCmd::Metadata {
+                                cmd: data_cmd.clone(),
+                                origin,
+                            },
+                            id: MessageId::in_response_to(&msg.id()),
+                            target_section_pk: None,
+                        },
+                        dst: DstLocation::Section(dst_address),
+                        to_be_aggregated: false, // TODO: to_be_aggregated: true,
+                    }));
+                }
+                (
+                    payment,
+                    cmd,
+                    utils::serialise(cmd)?.len() as u64,
+                    cmd.dst_address(),
+                )
+            }
             _ => return Ok(NodeMessagingDuty::NoOp),
+        };
+
+        let payment = if let Some(payment) = payment {
+            payment
+        } else {
+            return Err(Error::Logic(
+                "TransferAgreementProof required for newly created data".to_string(),
+            ));
         };
 
         // Make sure we are actually at the correct replicas,
@@ -281,7 +307,7 @@ impl Transfers {
                 to_be_aggregated: false, // TODO: to_be_aggregated: true,
             }));
         }
-        let registration = self.replicas.register(&payment).await;
+        let registration = self.replicas.register(payment).await;
         let result = match registration {
             Ok(_) => match self
                 .replicas
@@ -325,7 +351,7 @@ impl Transfers {
                         to_be_aggregated: false, // TODO: to_be_aggregated: true,
                     }));
                 }
-                info!("Payment: forwarding data..");
+                info!("Payment successful! Forwarding data to DataSection");
                 // consider having the section actor be
                 // informed of this transfer as well..
                 Ok(NodeMessagingDuty::Send(OutgoingMsg {

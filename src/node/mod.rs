@@ -199,7 +199,7 @@ impl Node {
     }
 
     fn handle_error(&self, err: &Error) {
-        info!("unimplemented: Handle errors.. {}", err)
+        info!("unimplemented: Handle errors.. {:?}", err)
     }
 }
 

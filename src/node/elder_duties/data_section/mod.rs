@@ -17,8 +17,7 @@ use crate::{
     capacity::ChunkHolderDbs,
     node::node_ops::{DataSectionDuty, NetworkDuties, RewardCmd, RewardDuty},
     node::NodeInfo,
-    ElderState,
-    Result,
+    ElderState, Result,
 };
 use log::info;
 use sn_data_types::{OwnerType, Result as DtResult, Signing, WalletInfo};
